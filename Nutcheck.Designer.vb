@@ -71,7 +71,6 @@ Partial Class Nutcheck
         Me.txtTgtAddresses.Name = "txtTgtAddresses"
         Me.txtTgtAddresses.Size = New System.Drawing.Size(351, 20)
         Me.txtTgtAddresses.TabIndex = 1
-        Me.txtTgtAddresses.Text = "192.168.1.1"
         Me.txtTgtAddresses.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtPorts
@@ -126,7 +125,7 @@ Partial Class Nutcheck
         Me.chkPing.AutoSize = True
         Me.chkPing.Checked = True
         Me.chkPing.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkPing.Location = New System.Drawing.Point(34, 7)
+        Me.chkPing.Location = New System.Drawing.Point(38, 6)
         Me.chkPing.Name = "chkPing"
         Me.chkPing.Size = New System.Drawing.Size(71, 17)
         Me.chkPing.TabIndex = 27
@@ -184,7 +183,7 @@ Partial Class Nutcheck
         Me.chkTcp.AutoSize = True
         Me.chkTcp.Checked = True
         Me.chkTcp.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkTcp.Location = New System.Drawing.Point(34, 50)
+        Me.chkTcp.Location = New System.Drawing.Point(38, 52)
         Me.chkTcp.Name = "chkTcp"
         Me.chkTcp.Size = New System.Drawing.Size(71, 17)
         Me.chkTcp.TabIndex = 28
@@ -195,7 +194,7 @@ Partial Class Nutcheck
         '
         Me.chkUdp.AutoSize = True
         Me.chkUdp.Enabled = False
-        Me.chkUdp.Location = New System.Drawing.Point(34, 73)
+        Me.chkUdp.Location = New System.Drawing.Point(38, 75)
         Me.chkUdp.Name = "chkUdp"
         Me.chkUdp.Size = New System.Drawing.Size(73, 17)
         Me.chkUdp.TabIndex = 33
@@ -345,18 +344,18 @@ Partial Class Nutcheck
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(351, 20)
         Me.Label5.TabIndex = 55
-        Me.Label5.Text = "Ex: 192.168.1.1, 192.168.0.0/24, yahoo.com"
+        Me.Label5.Text = "Ex: 192.168.1.1, 192.168.0.0/24, yourfavoritedomain.com"
         Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'chkNetbios
         '
         Me.chkNetbios.AutoSize = True
         Me.chkNetbios.Enabled = False
-        Me.chkNetbios.Location = New System.Drawing.Point(34, 27)
+        Me.chkNetbios.Location = New System.Drawing.Point(38, 29)
         Me.chkNetbios.Name = "chkNetbios"
-        Me.chkNetbios.Size = New System.Drawing.Size(102, 17)
+        Me.chkNetbios.Size = New System.Drawing.Size(124, 17)
         Me.chkNetbios.TabIndex = 56
-        Me.chkNetbios.Text = "NetBios Lookup"
+        Me.chkNetbios.Text = "NetBios Query (WIP)"
         Me.chkNetbios.UseVisualStyleBackColor = True
         '
         'Nutcheck

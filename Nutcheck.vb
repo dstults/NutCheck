@@ -229,7 +229,7 @@ Public Class Nutcheck
         If ex.InnerException IsNot Nothing Then
             LogVerbose("EXCEPTION:  " & ex.Message & vbNewLine & "    --> " & ex.InnerException.Message)
         Else
-            LogVerbose("EXCEPTION:  " & ex.Message & vbNewLine & "    --> (no further information accompanies this error)")
+            LogVerbose("EXCEPTION:  " & ex.Message)
         End If
     End Sub
 
@@ -244,10 +244,10 @@ Public Class Nutcheck
             GetIPAddresses()
             If netJobs.Count > 0 Then
                 If chkPing.Checked Then DoPingTest() Else LogBasic("Ping test skipped!")
-                'If chkNetbios.Checked Then DoNetbiosTest() Else ("NetBIOS test skipped!")
+                If chkNetbios.Checked Then PrepareNetbiosTest() Else LogBasic("NetBIOS test skipped!")
                 If chkTcp.Checked Or chkUdp.Checked Then GetPort()
                 If chkTcp.Checked Then PrepareTcpTests() Else LogBasic("TCP test skipped!")
-                'If chkUdp.Checked Then DoUdpTest() Else LogBasic("UDP test skipped!")
+                If chkUdp.Checked Then PrepareUdpTest() Else LogBasic("UDP test skipped!")
             Else
                 LogBasic("No addresses found, aborting!")
             End If
@@ -389,6 +389,7 @@ Public Class Nutcheck
                     LogVerbose(tgtIp.ToString)
                     netJobs.Add(New ClsNetJob(tgtIp))
                 Next
+                netJobs.Last.Hostname = domainRaw
                 LogVerbose("DNS resolution: successful")
                 getIpSuccess = True
             Else
@@ -424,13 +425,13 @@ Public Class Nutcheck
     End Sub
 
     Private Sub PrepareNetbiosTest()
-        LogVerbose("Testing for hostnames (NetBIOS test)...")
+        'LogVerbose("Testing for hostnames (NetBIOS test)...")
 
-        For Each nbJob As ClsNetJob In netJobs
-            netbiosJobs.Add(nbJob)
-        Next
+        'For Each nbJob As ClsNetJob In netJobs
+        'If nbJob.Hostname = "" Then netbiosJobs.Add(nbJob)
+        'Next
 
-        LogVerbose("Netbios test finished")
+        'LogVerbose("Netbios test finished")
     End Sub
 
     Private Sub GetPort()
@@ -524,6 +525,21 @@ Public Class Nutcheck
                 End If
             Next
         End If
+        If netbiosJobs.Count > 0 Then
+            For intA As Integer = netbiosJobs.Count - 1 To 0 Step -1
+                Dim nbJob As ClsNetJob = netJobs(intA)
+                If nbJob.Hostname = "" Then
+                    Try
+                        nbJob.Hostname = Net.Dns.GetHostEntry(nbJob.TgtIp).HostName
+                        LogBasic(MakeIpWide(nbJob.TgtIp) & " hostname: " & nbJob.Hostname)
+                    Catch ex As Exception
+                        LogError(ex)
+                        nbJob.Hostname = "-"
+                    End Try
+                End If
+                netbiosJobs.Remove(nbJob)
+            Next
+        End If
         If currentBoredom - 1 > myTimeout / Timer1.Interval Or JobsAllDone() Then
             Form_Work_End()
         Else
@@ -558,6 +574,7 @@ Public Class Nutcheck
                 Case Net.NetworkInformation.IPStatus.Success
                     pingJob.PingSuccessful = True
                     LogResult(MakeIpWide(pingJob.TgtIp) & " :  ICMP PING REPLY   ( = " & pingJob.PingRoundtripTime.ToString & " ms )")
+                    If chkNetbios.Checked And pingJob.Hostname = "" Then netbiosJobs.Add(pingJob)
                 Case Else
                     pingJob.PingSuccessful = False
                     ' we might also want to flag it as errored though depending on the specific reply...?
@@ -611,7 +628,7 @@ Public Class Nutcheck
                 If netJob.PingSuccessful Then pingResult = " ! |" : canIgnoreJob = False Else pingResult = "   |"
             End If
             If chkNetbios.Checked Then
-                If netJob.Hostname = "" Then netBios = " ? ? ? ? |" Else netBios = Strings.Left(netJob.Hostname, 9) & "|" : canIgnoreJob = False
+                If netJob.Hostname = "-" Or netJob.Hostname = "" Then netBios = " ? ? ? ? |" Else netBios = Strings.Left(netJob.Hostname & "         ", 9) & "|" : canIgnoreJob = False
             End If
             If chkTcp.Checked Or chkUdp.Checked Then
                 For Each hitPort As Integer In hitPorts
