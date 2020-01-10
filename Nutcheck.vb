@@ -7,7 +7,7 @@ Public Class Nutcheck
 
 #Region "Declarations"
 
-    Public programNameWithVersion As String = "NutCheck v0.91"
+    Public programNameWithVersion As String = "NutCheck v0.92"
 
     Public Class ClsTcpJob
         Public parent As ClsNetJob
@@ -70,7 +70,56 @@ Public Class Nutcheck
 #Region "Startup, Resets, Shared Functions"
 
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        GetComputerStats()
+        txtTgtAddresses.Text = myIpAddress & "/" & subnetMask
+        txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 1723, 3389, 5900"
         Form_Reset()
+    End Sub
+
+    Public myComputerName As String
+    Public myIpAddress As String
+    Public subnetMask As String
+    Public myGateway As String
+    Public dns1 As String
+    Public dns2 As String
+    Private Sub GetComputerStats()
+        ' Courtesy of: https://stackoverflow.com/questions/40814462/get-ip-address-subnet-default-gateway-dns1-and-dns2-with-vb-net
+
+        'Computer Name
+        myComputerName = System.Net.Dns.GetHostName()
+        For Each ip In System.Net.Dns.GetHostEntry(myComputerName).AddressList
+            If ip.AddressFamily = Net.Sockets.AddressFamily.InterNetwork Then
+                'IPv4 Adress
+                myIpAddress = ip.ToString()
+
+                For Each adapter As Net.NetworkInformation.NetworkInterface In Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
+                    For Each unicastIPAddressInformation As Net.NetworkInformation.UnicastIPAddressInformation In adapter.GetIPProperties().UnicastAddresses
+                        If unicastIPAddressInformation.Address.AddressFamily = Net.Sockets.AddressFamily.InterNetwork Then
+                            If ip.Equals(unicastIPAddressInformation.Address) Then
+                                'Subnet Mask
+                                subnetMask = unicastIPAddressInformation.IPv4Mask.ToString
+
+                                Dim adapterProperties As Net.NetworkInformation.IPInterfaceProperties = adapter.GetIPProperties()
+                                For Each gateway As Net.NetworkInformation.GatewayIPAddressInformation In adapterProperties.GatewayAddresses
+                                    'Default Gateway
+                                    myGateway = gateway.Address.ToString()
+                                Next
+
+                                'DNS1
+                                If adapterProperties.DnsAddresses.Count > 0 Then
+                                    dns1 = adapterProperties.DnsAddresses(0).ToString()
+                                End If
+
+                                'DNS2
+                                If adapterProperties.DnsAddresses.Count > 1 Then
+                                    dns2 = adapterProperties.DnsAddresses(1).ToString()
+                                End If
+                            End If
+                        End If
+                    Next
+                Next
+            End If
+        Next
     End Sub
 
     Private Sub Form_Reset()
@@ -226,7 +275,7 @@ Public Class Nutcheck
         ' then attempt to parse as IP
         ' then dns lookup if failed
 
-        Dim checkForCommas() As String = Split(txtTgtStart.Text, ",")
+        Dim checkForCommas() As String = Split(txtTgtAddresses.Text, ",")
         ' DNS querie will fail unless you trim excess spaces
         For intA As Integer = 0 To checkForCommas.Length - 1
             checkForCommas(intA) = Trim(checkForCommas(intA))
@@ -246,23 +295,49 @@ Public Class Nutcheck
     End Sub
 
     Private Sub GetIPAddress_MaskedGroup(ipAndMask As String())
-        ' CIDR ONLY FOR NOW!
-        ' SAMPLE INPUT: 192.168.1.0/24
-        ' OUTPUT: 192.168.1.1-254
+        ' Nice little shrunk snippet for converting CIDR to subnet:
+        'Dim ip As Int64 = Convert.ToInt64(New String("1"c, cidr).PadRight(32, "0"c), 2)
+        'Return (String.Join(".", New Net.IPAddress(ip).GetAddressBytes.Reverse))
 
         LogBasic("Attempting IP mask parse: " & ipAndMask(0) & " / " & ipAndMask(1))
         ' Sampled from: https://social.msdn.microsoft.com/Forums/en-US/b216daf2-aac4-4a43-91e1-e1d216c63f0c/find-ip-range-from-cidr-mask?forum=vbgeneral
         Dim sampleIp As Net.IPAddress = Net.IPAddress.Parse(ipAndMask(0))
         'get the bytes of the address
         Dim addrOctets As List(Of Byte) = sampleIp.GetAddressBytes.ToList
+        ' 192.168.1.104 ==> 104.1.168.192
         addrOctets.Reverse() 'reverse for bitconverter
 
         'convert to IP addr to number
-        Dim ipAsInt As Integer = BitConverter.ToInt32(addrOctets.ToArray, 0)
-        Dim cidr As Integer = CInt(ipAndMask(1))
-        Dim ipCount As Integer = 1 << (32 - cidr) ' network size (hosts will be minus 2) '' wtf is << and HOW DOES THAT WORK?!
-        Dim mask As Integer = &H80000000 >> (cidr - 1) 'create mask
-        Dim netnum As Integer = ipAsInt And mask
+        '    104 = 01101000 / 1 = 00000001 / 168 = ‭10101000‬ / 192 = ‭11000000‬ ...
+        '            01101000 00000001 10101000 11000000? so that should be 1744939200, but they got -‭1062731416‬
+        ' reverse:   11000000 10101000 00000001 01101000 that's a perfect match...negativized
+        '   result:  ‭11111111 11111111 11111111 11111111
+        '            11000000 10101000 00000001 01101000‬
+        Dim ipAsNumber As Integer = BitConverter.ToInt32(addrOctets.ToArray, 0)
+
+        Dim cidr As Integer
+        Dim maskAsNumber As Integer
+        Dim ipCount As Integer
+        If InStr(ipAndMask(1), ".") Then
+            ' PROCESS A RAW MASK -- ACTUALLY SEEMS EASY!
+            Dim maskOctets As List(Of Byte) = Net.IPAddress.Parse(ipAndMask(1)).GetAddressBytes.ToList
+            maskOctets.Reverse()
+            maskAsNumber = BitConverter.ToInt32(maskOctets.ToArray, 0)
+            ipCount = Not maskAsNumber + 1
+        Else
+            cidr = CInt(ipAndMask(1))
+            ' 00000000 00000000 00000000 00000001 gets shifted left by 32-cidr (so 32-24 is 8...shifted left 8 is:)
+            ' 00000000 00000000 00000001 00000000 <--- that's 256 clients! AMAZING!
+            ipCount = 1 << (32 - cidr) ' network size (hosts will be minus 2)
+
+            ' &H is hexadecimal, 8000 0000 would therefore be...2,147,483,648..which is half of 4,294,967,296, which is 256*256*256*256
+            ' ... More importantly, it's 10000000 00000000 00000000 00000000 so >> (cidr - 1) would mean move 1 right (24-1=) 23 spaces
+            ' So...00000000 00000000 00000001 00000000 is the final result!
+            maskAsNumber = &H80000000 >> (cidr - 1) 'create mask
+        End If
+
+        ' This makes perfect sense:
+        Dim netnum As Integer = ipAsNumber And maskAsNumber
         Dim subnetInt() As Byte = BitConverter.GetBytes(netnum) 'get bytes for network number
         Array.Reverse(subnetInt) 'in correct order
         Dim subnetId As New Net.IPAddress(subnetInt) ' actual network id
@@ -362,7 +437,7 @@ Public Class Nutcheck
         LogBasic("Parsing user port input...")
 
         ' Test input for portiness
-        Dim strTgtPortsPre() As String = Split(txtPort.Text, ",")
+        Dim strTgtPortsPre() As String = Split(txtPorts.Text, ",")
         Dim strTgtPorts As New HashSet(Of String)
         For Each iStr As String In strTgtPortsPre
             If InStr(iStr, "-") Then
@@ -565,7 +640,16 @@ Public Class Nutcheck
                     portResults &= " |"
                 Next
             End If
-            If canIgnoreJob = False Then LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults) Else ignoredIps.Add(netJob.TgtIp.ToString)
+            If netJob.TgtIp.ToString = myIpAddress Then
+                canIgnoreJob = False
+                LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults & "<--Me")
+            Else
+                If canIgnoreJob = False Then
+                    LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults)
+                Else
+                    ignoredIps.Add(netJob.TgtIp.ToString)
+                End If
+            End If
         Next
         LogPretty("=================" & lotsOfEquals)
         If ignoredIps.Count > 0 Then

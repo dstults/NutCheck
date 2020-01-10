@@ -24,8 +24,8 @@ Partial Class Nutcheck
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.btnTest = New System.Windows.Forms.Button()
-        Me.txtTgtStart = New System.Windows.Forms.TextBox()
-        Me.txtPort = New System.Windows.Forms.TextBox()
+        Me.txtTgtAddresses = New System.Windows.Forms.TextBox()
+        Me.txtPorts = New System.Windows.Forms.TextBox()
         Me.lblPort = New System.Windows.Forms.Label()
         Me.lblIP = New System.Windows.Forms.Label()
         Me.lblTimeout = New System.Windows.Forms.Label()
@@ -57,38 +57,38 @@ Partial Class Nutcheck
         '
         'btnTest
         '
-        Me.btnTest.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnTest.Location = New System.Drawing.Point(588, 7)
+        Me.btnTest.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnTest.Location = New System.Drawing.Point(326, 85)
         Me.btnTest.Name = "btnTest"
-        Me.btnTest.Size = New System.Drawing.Size(137, 37)
+        Me.btnTest.Size = New System.Drawing.Size(222, 37)
         Me.btnTest.TabIndex = 0
-        Me.btnTest.Text = "RUN TEST"
+        Me.btnTest.Text = "R U N   T E S T"
         Me.btnTest.UseVisualStyleBackColor = True
         '
-        'txtTgtStart
+        'txtTgtAddresses
         '
-        Me.txtTgtStart.Location = New System.Drawing.Point(153, 34)
-        Me.txtTgtStart.Name = "txtTgtStart"
-        Me.txtTgtStart.Size = New System.Drawing.Size(287, 20)
-        Me.txtTgtStart.TabIndex = 1
-        Me.txtTgtStart.Text = "192.168.1.1"
-        Me.txtTgtStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtTgtAddresses.Location = New System.Drawing.Point(153, 34)
+        Me.txtTgtAddresses.Name = "txtTgtAddresses"
+        Me.txtTgtAddresses.Size = New System.Drawing.Size(351, 20)
+        Me.txtTgtAddresses.TabIndex = 1
+        Me.txtTgtAddresses.Text = "192.168.1.1"
+        Me.txtTgtAddresses.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'txtPort
+        'txtPorts
         '
-        Me.txtPort.Location = New System.Drawing.Point(461, 34)
-        Me.txtPort.Name = "txtPort"
-        Me.txtPort.Size = New System.Drawing.Size(120, 20)
-        Me.txtPort.TabIndex = 19
-        Me.txtPort.Text = "20-22, 80, 443"
-        Me.txtPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtPorts.Location = New System.Drawing.Point(509, 34)
+        Me.txtPorts.Name = "txtPorts"
+        Me.txtPorts.Size = New System.Drawing.Size(336, 20)
+        Me.txtPorts.TabIndex = 19
+        Me.txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 1723, 3389, 5900"
+        Me.txtPorts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'lblPort
         '
         Me.lblPort.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblPort.Location = New System.Drawing.Point(461, 12)
+        Me.lblPort.Location = New System.Drawing.Point(509, 12)
         Me.lblPort.Name = "lblPort"
-        Me.lblPort.Size = New System.Drawing.Size(120, 20)
+        Me.lblPort.Size = New System.Drawing.Size(336, 20)
         Me.lblPort.TabIndex = 23
         Me.lblPort.Text = "Ports"
         Me.lblPort.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -98,7 +98,7 @@ Partial Class Nutcheck
         Me.lblIP.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblIP.Location = New System.Drawing.Point(156, 12)
         Me.lblIP.Name = "lblIP"
-        Me.lblIP.Size = New System.Drawing.Size(284, 20)
+        Me.lblIP.Size = New System.Drawing.Size(348, 20)
         Me.lblIP.TabIndex = 22
         Me.lblIP.Text = "Destination(s)"
         Me.lblIP.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -164,7 +164,7 @@ Partial Class Nutcheck
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ReadOnly = True
         Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtLog.Size = New System.Drawing.Size(378, 346)
+        Me.txtLog.Size = New System.Drawing.Size(378, 433)
         Me.txtLog.TabIndex = 35
         Me.txtLog.WordWrap = False
         '
@@ -210,15 +210,15 @@ Partial Class Nutcheck
         Me.txtResults.Name = "txtResults"
         Me.txtResults.ReadOnly = True
         Me.txtResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtResults.Size = New System.Drawing.Size(329, 346)
+        Me.txtResults.Size = New System.Drawing.Size(329, 433)
         Me.txtResults.TabIndex = 40
         Me.txtResults.WordWrap = False
         '
         'lblPortExample
         '
-        Me.lblPortExample.Location = New System.Drawing.Point(462, 57)
+        Me.lblPortExample.Location = New System.Drawing.Point(510, 57)
         Me.lblPortExample.Name = "lblPortExample"
-        Me.lblPortExample.Size = New System.Drawing.Size(120, 20)
+        Me.lblPortExample.Size = New System.Drawing.Size(336, 20)
         Me.lblPortExample.TabIndex = 41
         Me.lblPortExample.Text = "Ex: 20-22, 80, 443"
         Me.lblPortExample.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -226,7 +226,7 @@ Partial Class Nutcheck
         'btnPreset1
         '
         Me.btnPreset1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset1.Location = New System.Drawing.Point(902, 16)
+        Me.btnPreset1.Location = New System.Drawing.Point(920, 20)
         Me.btnPreset1.Name = "btnPreset1"
         Me.btnPreset1.Size = New System.Drawing.Size(109, 28)
         Me.btnPreset1.TabIndex = 42
@@ -238,7 +238,7 @@ Partial Class Nutcheck
         '
         Me.btnReset.Enabled = False
         Me.btnReset.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnReset.Location = New System.Drawing.Point(731, 7)
+        Me.btnReset.Location = New System.Drawing.Point(554, 85)
         Me.btnReset.Name = "btnReset"
         Me.btnReset.Size = New System.Drawing.Size(137, 37)
         Me.btnReset.TabIndex = 43
@@ -253,14 +253,14 @@ Partial Class Nutcheck
         Me.txtOrganizedResults.Name = "txtOrganizedResults"
         Me.txtOrganizedResults.ReadOnly = True
         Me.txtOrganizedResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtOrganizedResults.Size = New System.Drawing.Size(422, 346)
+        Me.txtOrganizedResults.Size = New System.Drawing.Size(413, 433)
         Me.txtOrganizedResults.TabIndex = 44
         Me.txtOrganizedResults.WordWrap = False
         '
         'btnPreset2
         '
         Me.btnPreset2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset2.Location = New System.Drawing.Point(1017, 16)
+        Me.btnPreset2.Location = New System.Drawing.Point(1035, 20)
         Me.btnPreset2.Name = "btnPreset2"
         Me.btnPreset2.Size = New System.Drawing.Size(109, 28)
         Me.btnPreset2.TabIndex = 45
@@ -271,7 +271,7 @@ Partial Class Nutcheck
         'btnPreset3
         '
         Me.btnPreset3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset3.Location = New System.Drawing.Point(902, 47)
+        Me.btnPreset3.Location = New System.Drawing.Point(920, 51)
         Me.btnPreset3.Name = "btnPreset3"
         Me.btnPreset3.Size = New System.Drawing.Size(109, 28)
         Me.btnPreset3.TabIndex = 46
@@ -282,7 +282,7 @@ Partial Class Nutcheck
         'btnPreset4
         '
         Me.btnPreset4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset4.Location = New System.Drawing.Point(1017, 47)
+        Me.btnPreset4.Location = New System.Drawing.Point(1035, 51)
         Me.btnPreset4.Name = "btnPreset4"
         Me.btnPreset4.Size = New System.Drawing.Size(109, 28)
         Me.btnPreset4.TabIndex = 47
@@ -322,7 +322,7 @@ Partial Class Nutcheck
         Me.chkIgnoreDead.AutoSize = True
         Me.chkIgnoreDead.Checked = True
         Me.chkIgnoreDead.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkIgnoreDead.Location = New System.Drawing.Point(588, 50)
+        Me.chkIgnoreDead.Location = New System.Drawing.Point(160, 97)
         Me.chkIgnoreDead.Name = "chkIgnoreDead"
         Me.chkIgnoreDead.Size = New System.Drawing.Size(127, 17)
         Me.chkIgnoreDead.TabIndex = 53
@@ -343,7 +343,7 @@ Partial Class Nutcheck
         '
         Me.Label5.Location = New System.Drawing.Point(153, 57)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(287, 20)
+        Me.Label5.Size = New System.Drawing.Size(351, 20)
         Me.Label5.TabIndex = 55
         Me.Label5.Text = "Ex: 192.168.1.1, 192.168.0.0/24, yahoo.com"
         Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -363,7 +363,7 @@ Partial Class Nutcheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1163, 504)
+        Me.ClientSize = New System.Drawing.Size(1152, 591)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.chkVerboseMode)
         Me.Controls.Add(Me.chkIgnoreDead)
@@ -386,8 +386,8 @@ Partial Class Nutcheck
         Me.Controls.Add(Me.txtTimeout)
         Me.Controls.Add(Me.lblPort)
         Me.Controls.Add(Me.lblIP)
-        Me.Controls.Add(Me.txtPort)
-        Me.Controls.Add(Me.txtTgtStart)
+        Me.Controls.Add(Me.txtPorts)
+        Me.Controls.Add(Me.txtTgtAddresses)
         Me.Controls.Add(Me.btnTest)
         Me.Controls.Add(Me.chkPing)
         Me.Controls.Add(Me.chkTcp)
@@ -403,8 +403,8 @@ Partial Class Nutcheck
     End Sub
 
     Friend WithEvents btnTest As Button
-    Friend WithEvents txtTgtStart As TextBox
-    Friend WithEvents txtPort As TextBox
+    Friend WithEvents txtTgtAddresses As TextBox
+    Friend WithEvents txtPorts As TextBox
     Friend WithEvents lblPort As Label
     Friend WithEvents lblIP As Label
     Friend WithEvents lblTimeout As Label
