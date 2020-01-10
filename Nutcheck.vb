@@ -9,7 +9,7 @@
     Public Class ClsPingJob
         Public tgtIp As String
         Public ping As New Net.NetworkInformation.Ping
-        Public pingReply As New Task(Of Net.NetworkInformation.PingReply)
+        Public replyTask As Task(Of Net.NetworkInformation.PingReply)
     End Class
 
     Public programNameWithVersion As String = "NutCheck v0.84"
@@ -129,7 +129,7 @@
             pingJobs.Last.tgtIp = tgtIp.ToString
             LogOut("Sending ping (ICMP Echo Request) to " & tgtAddresses.First.ToString)
             Try
-                pingJobs.Last.pingResult.SendPingAsync(tgtIp)
+                pingJobs.Last.replyTask = pingJobs.Last.ping.SendPingAsync(tgtIp)
             Catch ex As Exception
                 LogOut("EXCEPTION:  " & ex.Message)
             End Try
@@ -203,7 +203,7 @@
 
         If pingJobs.count > 0 Then
             For Each pingJob As ClsPingJob In pingJobs
-                If pingJob.pingResult.Then Then
+                If pingJob.replyTask.Status.Then Then
 
 
                 End If
