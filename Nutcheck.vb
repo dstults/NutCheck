@@ -218,7 +218,7 @@ Public Class Nutcheck
     End Sub
 
     Private Sub GetIPAddresses()
-        LogBasic("Attempting to read IP address...")
+        LogBasic("Attempting to parse user IP addresses...")
         ' first split by commas
         ' then check for slashes -- later we'll add ability to use hyphens for ranges
         ' then attempt to parse as IP
@@ -233,7 +233,6 @@ Public Class Nutcheck
             Dim checkForSlashes() As String = Split(iStr, "/")
             If checkForSlashes.Length > 1 Then
                 ' Parse as masked
-                LogVerbose("Detected masked group: " & checkForSlashes(0) & " / " & checkForSlashes(1))
                 GetIPAddress_MaskedGroup(checkForSlashes)
             Else
                 ' Parse as single entity
@@ -241,7 +240,7 @@ Public Class Nutcheck
             End If
         Next
 
-        LogBasic("IP address acquisition finished")
+        LogBasic("IP address acquisition finished: " & netJobs.Count & " ips added")
     End Sub
 
     Private Sub GetIPAddress_MaskedGroup(ipAndMask As String())
@@ -249,6 +248,7 @@ Public Class Nutcheck
         ' SAMPLE INPUT: 192.168.1.0/24
         ' OUTPUT: 192.168.1.1-254
 
+        LogBasic("Attempting IP mask parse: " & ipAndMask(0) & " / " & ipAndMask(1))
         ' Sampled from: https://social.msdn.microsoft.com/Forums/en-US/b216daf2-aac4-4a43-91e1-e1d216c63f0c/find-ip-range-from-cidr-mask?forum=vbgeneral
         Dim sampleIp As Net.IPAddress = Net.IPAddress.Parse(ipAndMask(0))
         'get the bytes of the address
@@ -273,6 +273,7 @@ Public Class Nutcheck
             Dim hostIp As New Net.IPAddress(hostNum) 'host
             netJobs.Add(New ClsNetJob(hostIp))
         Next
+        LogBasic("Bulk subnet IPs added: " & (ipCount - 2).ToString)
 
     End Sub
 
@@ -285,14 +286,14 @@ Public Class Nutcheck
             LogVerbose("IP parsed: " & tgtAddress.ToString)
         Catch ex As Exception
             LogError(ex)
-            LogBasic("IP parse: failed to parse '" & ipRaw & "' as an IPv4, will attempt DNS process")
+            LogBasic("'" & ipRaw & "' not IPv4, trying DNS")
             Try_DNS(ipRaw)
         End Try
         Return tgtAddress
     End Function
 
     Private Function Try_DNS(domainRaw As String) As Boolean
-        LogBasic("Attempting DNS process...")
+        LogVerbose("Attempting DNS process...")
 
         Dim DNSLookup As New Net.IPHostEntry
         Dim getIpSuccess As Boolean
@@ -305,20 +306,20 @@ Public Class Nutcheck
         End Try
 
         If DNSLookup IsNot Nothing Then
-            LogBasic("NS record(s) found for: " & domainRaw)
             If DNSLookup.AddressList IsNot Nothing Then
+                LogBasic("NS record(s) found for: '" & domainRaw & "' with " & DNSLookup.AddressList.Count & " ips")
                 For Each tgtIp As Net.IPAddress In DNSLookup.AddressList
                     LogVerbose(tgtIp.ToString)
                     netJobs.Add(New ClsNetJob(tgtIp))
                 Next
-                LogBasic("DNS resolution: successful")
+                LogVerbose("DNS resolution: successful")
                 getIpSuccess = True
             Else
-                LogBasic("DNS resolution: No addresses attached to NS record, aborting")
+                LogBasic("DNS resolution: No addresses attached to NS record '" & domainRaw & "', aborting")
                 getIpSuccess = False
             End If
         Else
-            LogBasic("DNS resolution: NS found but no addresses found associated with it??")
+            LogBasic("DNS resolution: NS found for '" & domainRaw & "' but no addresses associated with it??")
             getIpSuccess = False
         End If
 
@@ -328,7 +329,9 @@ Public Class Nutcheck
     Private Sub DoPingTest()
         LogBasic("Attempting ping operation...")
 
+        Dim pingTestCount As Integer
         For Each pingJob As ClsNetJob In netJobs
+            pingTestCount += 1
             pingJobs.Add(pingJob)
             ' Suppress this message if doing more than a few IPs:
             If chkVerboseMode.Checked Then LogVerbose("Sending ping (ICMP Echo Request) to " & pingJob.TgtIp.ToString)
@@ -340,7 +343,7 @@ Public Class Nutcheck
             End Try
         Next
 
-        LogBasic("Ping tests started")
+        LogBasic("Ping tests started: " & pingTestCount.ToString)
     End Sub
 
     Private Sub PrepareNetbiosTest()
@@ -354,7 +357,7 @@ Public Class Nutcheck
     End Sub
 
     Private Sub GetPort()
-        LogBasic("Attempting TCP port scan...")
+        LogBasic("Parsing user port input...")
 
         ' Test input for portiness
         Dim strTgtPortsPre() As String = Split(txtPort.Text, ",")
@@ -380,7 +383,7 @@ Public Class Nutcheck
             End If
         Next
 
-        LogBasic("Port acquisition finished")
+        LogBasic("Port input complete")
     End Sub
 
     Private Sub PrepareTcpTests()
