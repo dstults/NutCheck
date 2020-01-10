@@ -51,6 +51,8 @@ Partial Class Nutcheck
         Me.Label3 = New System.Windows.Forms.Label()
         Me.chkIgnoreDead = New System.Windows.Forms.CheckBox()
         Me.chkVerboseMode = New System.Windows.Forms.CheckBox()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.chkNetbios = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'btnTest
@@ -65,9 +67,9 @@ Partial Class Nutcheck
         '
         'txtTgtStart
         '
-        Me.txtTgtStart.Location = New System.Drawing.Point(138, 34)
+        Me.txtTgtStart.Location = New System.Drawing.Point(153, 34)
         Me.txtTgtStart.Name = "txtTgtStart"
-        Me.txtTgtStart.Size = New System.Drawing.Size(302, 20)
+        Me.txtTgtStart.Size = New System.Drawing.Size(287, 20)
         Me.txtTgtStart.TabIndex = 1
         Me.txtTgtStart.Text = "192.168.1.1"
         Me.txtTgtStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
@@ -94,16 +96,16 @@ Partial Class Nutcheck
         'lblIP
         '
         Me.lblIP.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblIP.Location = New System.Drawing.Point(134, 12)
+        Me.lblIP.Location = New System.Drawing.Point(156, 12)
         Me.lblIP.Name = "lblIP"
-        Me.lblIP.Size = New System.Drawing.Size(306, 20)
+        Me.lblIP.Size = New System.Drawing.Size(284, 20)
         Me.lblIP.TabIndex = 22
         Me.lblIP.Text = "Destination(s)"
         Me.lblIP.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'lblTimeout
         '
-        Me.lblTimeout.Location = New System.Drawing.Point(11, 58)
+        Me.lblTimeout.Location = New System.Drawing.Point(9, 97)
         Me.lblTimeout.Name = "lblTimeout"
         Me.lblTimeout.Size = New System.Drawing.Size(51, 20)
         Me.lblTimeout.TabIndex = 26
@@ -112,7 +114,7 @@ Partial Class Nutcheck
         '
         'txtTimeout
         '
-        Me.txtTimeout.Location = New System.Drawing.Point(68, 59)
+        Me.txtTimeout.Location = New System.Drawing.Point(66, 98)
         Me.txtTimeout.Name = "txtTimeout"
         Me.txtTimeout.Size = New System.Drawing.Size(48, 20)
         Me.txtTimeout.TabIndex = 25
@@ -124,7 +126,7 @@ Partial Class Nutcheck
         Me.chkPing.AutoSize = True
         Me.chkPing.Checked = True
         Me.chkPing.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkPing.Location = New System.Drawing.Point(34, 12)
+        Me.chkPing.Location = New System.Drawing.Point(34, 7)
         Me.chkPing.Name = "chkPing"
         Me.chkPing.Size = New System.Drawing.Size(71, 17)
         Me.chkPing.TabIndex = 27
@@ -143,7 +145,7 @@ Partial Class Nutcheck
         '
         'Label4
         '
-        Me.Label4.Location = New System.Drawing.Point(116, 59)
+        Me.Label4.Location = New System.Drawing.Point(114, 98)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(24, 20)
         Me.Label4.TabIndex = 32
@@ -157,7 +159,7 @@ Partial Class Nutcheck
         'txtLog
         '
         Me.txtLog.Font = New System.Drawing.Font("Courier New", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtLog.Location = New System.Drawing.Point(12, 108)
+        Me.txtLog.Location = New System.Drawing.Point(12, 151)
         Me.txtLog.Multiline = True
         Me.txtLog.Name = "txtLog"
         Me.txtLog.ReadOnly = True
@@ -169,7 +171,7 @@ Partial Class Nutcheck
         'lblSpinner
         '
         Me.lblSpinner.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.lblSpinner.Location = New System.Drawing.Point(284, 82)
+        Me.lblSpinner.Location = New System.Drawing.Point(284, 125)
         Me.lblSpinner.Name = "lblSpinner"
         Me.lblSpinner.Size = New System.Drawing.Size(23, 23)
         Me.lblSpinner.TabIndex = 36
@@ -182,7 +184,7 @@ Partial Class Nutcheck
         Me.chkTcp.AutoSize = True
         Me.chkTcp.Checked = True
         Me.chkTcp.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkTcp.Location = New System.Drawing.Point(34, 27)
+        Me.chkTcp.Location = New System.Drawing.Point(34, 50)
         Me.chkTcp.Name = "chkTcp"
         Me.chkTcp.Size = New System.Drawing.Size(71, 17)
         Me.chkTcp.TabIndex = 28
@@ -192,10 +194,8 @@ Partial Class Nutcheck
         'chkUdp
         '
         Me.chkUdp.AutoSize = True
-        Me.chkUdp.Checked = True
-        Me.chkUdp.CheckState = System.Windows.Forms.CheckState.Checked
         Me.chkUdp.Enabled = False
-        Me.chkUdp.Location = New System.Drawing.Point(34, 43)
+        Me.chkUdp.Location = New System.Drawing.Point(34, 73)
         Me.chkUdp.Name = "chkUdp"
         Me.chkUdp.Size = New System.Drawing.Size(73, 17)
         Me.chkUdp.TabIndex = 33
@@ -205,7 +205,7 @@ Partial Class Nutcheck
         'txtResults
         '
         Me.txtResults.Font = New System.Drawing.Font("Courier New", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtResults.Location = New System.Drawing.Point(396, 108)
+        Me.txtResults.Location = New System.Drawing.Point(396, 151)
         Me.txtResults.Multiline = True
         Me.txtResults.Name = "txtResults"
         Me.txtResults.ReadOnly = True
@@ -248,7 +248,7 @@ Partial Class Nutcheck
         'txtOrganizedResults
         '
         Me.txtOrganizedResults.Font = New System.Drawing.Font("Courier New", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtOrganizedResults.Location = New System.Drawing.Point(731, 108)
+        Me.txtOrganizedResults.Location = New System.Drawing.Point(731, 151)
         Me.txtOrganizedResults.Multiline = True
         Me.txtOrganizedResults.Name = "txtOrganizedResults"
         Me.txtOrganizedResults.ReadOnly = True
@@ -293,7 +293,7 @@ Partial Class Nutcheck
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 92)
+        Me.Label1.Location = New System.Drawing.Point(12, 135)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(53, 13)
         Me.Label1.TabIndex = 50
@@ -302,7 +302,7 @@ Partial Class Nutcheck
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(393, 92)
+        Me.Label2.Location = New System.Drawing.Point(393, 135)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(70, 13)
         Me.Label2.TabIndex = 51
@@ -311,7 +311,7 @@ Partial Class Nutcheck
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(728, 92)
+        Me.Label3.Location = New System.Drawing.Point(728, 135)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(96, 13)
         Me.Label3.TabIndex = 52
@@ -332,18 +332,39 @@ Partial Class Nutcheck
         'chkVerboseMode
         '
         Me.chkVerboseMode.AutoSize = True
-        Me.chkVerboseMode.Location = New System.Drawing.Point(71, 88)
+        Me.chkVerboseMode.Location = New System.Drawing.Point(71, 131)
         Me.chkVerboseMode.Name = "chkVerboseMode"
         Me.chkVerboseMode.Size = New System.Drawing.Size(65, 17)
         Me.chkVerboseMode.TabIndex = 54
         Me.chkVerboseMode.Text = "Verbose"
         Me.chkVerboseMode.UseVisualStyleBackColor = True
         '
+        'Label5
+        '
+        Me.Label5.Location = New System.Drawing.Point(153, 57)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(287, 20)
+        Me.Label5.TabIndex = 55
+        Me.Label5.Text = "Ex: 192.168.1.1, 192.168.0.0/24, yahoo.com"
+        Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'chkNetbios
+        '
+        Me.chkNetbios.AutoSize = True
+        Me.chkNetbios.Enabled = False
+        Me.chkNetbios.Location = New System.Drawing.Point(34, 27)
+        Me.chkNetbios.Name = "chkNetbios"
+        Me.chkNetbios.Size = New System.Drawing.Size(102, 17)
+        Me.chkNetbios.TabIndex = 56
+        Me.chkNetbios.Text = "NetBios Lookup"
+        Me.chkNetbios.UseVisualStyleBackColor = True
+        '
         'Nutcheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1163, 463)
+        Me.ClientSize = New System.Drawing.Size(1163, 504)
+        Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.chkVerboseMode)
         Me.Controls.Add(Me.chkIgnoreDead)
         Me.Controls.Add(Me.Label3)
@@ -371,6 +392,7 @@ Partial Class Nutcheck
         Me.Controls.Add(Me.chkPing)
         Me.Controls.Add(Me.chkTcp)
         Me.Controls.Add(Me.chkUdp)
+        Me.Controls.Add(Me.chkNetbios)
         Me.DoubleBuffered = True
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
         Me.Name = "Nutcheck"
@@ -408,4 +430,6 @@ Partial Class Nutcheck
     Friend WithEvents Label3 As Label
     Friend WithEvents chkIgnoreDead As CheckBox
     Friend WithEvents chkVerboseMode As CheckBox
+    Friend WithEvents Label5 As Label
+    Friend WithEvents chkNetbios As CheckBox
 End Class

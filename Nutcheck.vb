@@ -7,36 +7,66 @@ Public Class Nutcheck
 
 #Region "Declarations"
 
-    Public Class ClsTcpJob
-        Public tgtIp As String
-        Public tgtIpWide As String
-        Public tgtPort As Integer
-        Public tgtPortWide As String
-        Public tcpClient As New Net.Sockets.TcpClient
-    End Class
-
-    Public Class ClsPingJob
-        Public tgtIp As String
-        Public tgtIpWide As String
-        Public myPing As New Net.NetworkInformation.Ping
-        Public errored As Boolean
-        Public successful As Boolean
-        Public roundtripTime As Long
-    End Class
-
     Public programNameWithVersion As String = "NutCheck v0.90"
-    Public tgtAddresses As New HashSet(Of Net.IPAddress)
-    Public tgtPorts As New HashSet(Of Integer)
 
+    Public Class ClsTcpJob
+        Public parent As ClsNetJob
+        Public tgtPort As Integer
+        Public tcpClient As New Net.Sockets.TcpClient
+        Public portOpen As Boolean
+        Public replyTime As Integer
+        Public Sub New(setParent As ClsNetJob)
+            parent = setParent
+            parent.TcpJobs.Add(Me)
+        End Sub
+
+    End Class
+    Public Class ClsUdpJob
+        Public parent As ClsNetJob
+        Public tgtPort As Integer
+        Public udpClient As New Net.Sockets.UdpClient
+        Public portReplied As Boolean
+        Public replyTime As Integer
+        Public Sub New(setParent As ClsNetJob)
+            parent = setParent
+            parent.UdpJobs.Add(Me)
+        End Sub
+
+    End Class
+
+    Public Class ClsNetJob
+
+        Public TgtIp As Net.IPAddress
+
+        Public PingTest As New Net.NetworkInformation.Ping
+        Public PingErrored As Boolean
+        Public PingSuccessful As Boolean
+        Public PingRoundtripTime As Long
+
+        Public Hostname As String = ""
+
+        Public TcpJobs As New HashSet(Of ClsTcpJob)
+        Public UdpJobs As New HashSet(Of ClsUdpJob)
+
+        Public Sub New(setIp As Net.IPAddress)
+            TgtIp = setIp
+        End Sub
+
+    End Class
+
+    Public tgtPorts As New HashSet(Of Integer)
     Private currentBoredom As Integer = 0
     Private myTimeout As Integer = 2000 ' ms until I abort
 
-    Public pingJobs As New List(Of ClsPingJob)
+    Public netJobs As New List(Of ClsNetJob)
+    Public pingJobs As New List(Of ClsNetJob)
+    Public netbiosJobs As New List(Of ClsNetJob)
     Public tcpJobs As New List(Of ClsTcpJob)
+    Public udpJobs As New List(Of ClsUdpJob)
 
 #End Region
 
-#Region "Startup & Resets"
+#Region "Startup, Resets, Shared Functions"
 
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Form_Reset()
@@ -61,9 +91,11 @@ Public Class Nutcheck
         txtResults.Text = ""
         txtOrganizedResults.Text = ""
         tgtPorts.Clear()
-        tgtAddresses.Clear()
-        pingJobs.Clear()
+        netJobs.Clear()
+        pingJobs.clear()
+        netbiosJobs.clear()
         tcpJobs.Clear()
+        udpJobs.clear()
 
     End Sub
 
@@ -103,12 +135,24 @@ Public Class Nutcheck
 
         LogVerbose("Work complete!")
         LogResult(vbNewLine & "No more active tests remaining.")
-        LogPretty("")
-        LogPretty("=============================")
-        LogPretty("End of organized result dump.")
-        LogPretty("=============================")
+        DoFullPrettyLog
 
     End Sub
+
+    Public Function MakeIpWide(anIp As Net.IPAddress) As String
+        ' Whether this should use spaces or zeroes should be an option!
+        Dim octets As List(Of Byte) = anIp.GetAddressBytes.ToList
+        'Return Format(CInt(octets(0)), "000") & "." & Format(CInt(octets(1)), "000") & "." & Format(CInt(octets(2)), "000") & "." & Format(CInt(octets(3)), "000")
+        Return Strings.Left("  ",
+                            3 - Strings.Len(octets(0).ToString)) & octets(0).ToString & "." & Strings.Left("  ",
+                            3 - Strings.Len(octets(1).ToString)) & octets(1).ToString & "." & Strings.Left("  ",
+                            3 - Strings.Len(octets(2).ToString)) & octets(2).ToString & "." & Strings.Left("  ",
+                            3 - Strings.Len(octets(3).ToString)) & octets(3).ToString
+    End Function
+
+    Public Function MakePortWide(aPort As Integer) As String
+        Return Strings.Left("     ", 5 - Strings.Len(aPort.ToString)) & aPort.ToString
+    End Function
 
 #End Region
 
@@ -138,13 +182,6 @@ Public Class Nutcheck
         End If
     End Sub
 
-    Private Function MakeIpWide(ip As String) As String
-        ' Whether this should use spaces or zeroes should be an option!
-        Dim octets() As String = Strings.Split(ip, ".")
-        'Return Format(CInt(octets(0)), "000") & "." & Format(CInt(octets(1)), "000") & "." & Format(CInt(octets(2)), "000") & "." & Format(CInt(octets(3)), "000")
-        Return Strings.Left("  ", 3 - Strings.Len(octets(0))) & octets(0) & "." & Strings.Left("  ", 3 - Strings.Len(octets(1))) & octets(1) & "." & Strings.Left("  ", 3 - Strings.Len(octets(2))) & octets(2) & "." & Strings.Left("  ", 3 - Strings.Len(octets(3))) & octets(3)
-    End Function
-
 #End Region
 
     Private Sub BtnTest_Click(sender As Object, e As EventArgs) Handles btnTest.Click
@@ -154,8 +191,9 @@ Public Class Nutcheck
         If chkPing.Checked Or chkTcp.Checked Or chkUdp.Checked Then
             GetTestTimeout()
             GetIPAddresses()
-            If tgtAddresses.Count > 0 Then
+            If netJobs.Count > 0 Then
                 If chkPing.Checked Then DoPingTest() Else LogBasic("Ping test skipped!")
+                'If chkNetbios.Checked Then DoNetbiosTest() Else ("NetBIOS test skipped!")
                 If chkTcp.Checked Or chkUdp.Checked Then GetPort()
                 If chkTcp.Checked Then PrepareTcpTests() Else LogBasic("TCP test skipped!")
                 'If chkUdp.Checked Then DoUdpTest() Else LogBasic("UDP test skipped!")
@@ -171,7 +209,7 @@ Public Class Nutcheck
 
     Private Sub GetTestTimeout()
         ' Idiot-proofing
-        Dim myTimeout As Integer = CInt(txtTimeout.Text)
+        myTimeout = CInt(txtTimeout.Text)
         If myTimeout.ToString <> txtTimeout.Text Then
             ' Show user input was idiot-proofed
             LogBasic("Ping timeout input was changed")
@@ -187,6 +225,10 @@ Public Class Nutcheck
         ' then dns lookup if failed
 
         Dim checkForCommas() As String = Split(txtTgtStart.Text, ",")
+        ' DNS querie will fail unless you trim excess spaces
+        For intA As Integer = 0 To checkForCommas.Length - 1
+            checkForCommas(intA) = Trim(checkForCommas(intA))
+        Next
         For Each iStr As String In checkForCommas
             Dim checkForSlashes() As String = Split(iStr, "/")
             If checkForSlashes.Length > 1 Then
@@ -229,7 +271,7 @@ Public Class Nutcheck
             Dim hostNum() As Byte = BitConverter.GetBytes(host) 'get bytes for host 
             Array.Reverse(hostNum) 'in correct order
             Dim hostIp As New Net.IPAddress(hostNum) 'host
-            tgtAddresses.Add(hostIp)
+            netJobs.Add(New ClsNetJob(hostIp))
         Next
 
     End Sub
@@ -239,35 +281,35 @@ Public Class Nutcheck
         Try
             ' Test input for ip-addressyness
             tgtAddress = Net.IPAddress.Parse(ipRaw)
-            tgtAddresses.Add(tgtAddress)
-            LogVerbose("IP parse: " & tgtAddress.ToString)
+            netJobs.Add(New ClsNetJob(tgtAddress))
+            LogVerbose("IP parsed: " & tgtAddress.ToString)
         Catch ex As Exception
             LogError(ex)
-            LogBasic("IP parse: failed to parse '" & ipRaw & "', will attempt DNS process")
-            Try_DNS()
+            LogBasic("IP parse: failed to parse '" & ipRaw & "' as an IPv4, will attempt DNS process")
+            Try_DNS(ipRaw)
         End Try
         Return tgtAddress
     End Function
 
-    Private Function Try_DNS() As Boolean
+    Private Function Try_DNS(domainRaw As String) As Boolean
         LogBasic("Attempting DNS process...")
 
         Dim DNSLookup As New Net.IPHostEntry
         Dim getIpSuccess As Boolean
         Try
-            DNSLookup = Net.Dns.GetHostEntry(txtTgtStart.Text)
+            DNSLookup = Net.Dns.GetHostEntry(domainRaw)
         Catch ex As Exception
             LogError(ex)
-            LogBasic("DNS resolution: Failed to resolve host, terminating test prematurely")
+            LogBasic("DNS resolution: Failed to resolve host '" & domainRaw & "', terminating test prematurely")
             getIpSuccess = False
         End Try
 
         If DNSLookup IsNot Nothing Then
-            LogBasic("NS record(s) found for: " & txtTgtStart.Text)
+            LogBasic("NS record(s) found for: " & domainRaw)
             If DNSLookup.AddressList IsNot Nothing Then
                 For Each tgtIp As Net.IPAddress In DNSLookup.AddressList
                     LogVerbose(tgtIp.ToString)
-                    tgtAddresses.Add(tgtIp)
+                    netJobs.Add(New ClsNetJob(tgtIp))
                 Next
                 LogBasic("DNS resolution: successful")
                 getIpSuccess = True
@@ -286,21 +328,29 @@ Public Class Nutcheck
     Private Sub DoPingTest()
         LogBasic("Attempting ping operation...")
 
-        For Each tgtIp As Net.IPAddress In tgtAddresses
-            pingJobs.Add(New ClsPingJob)
-            pingJobs.Last.tgtIp = tgtIp.ToString
-            pingJobs.Last.tgtIpWide = MakeIpWide(pingJobs.Last.tgtIp)
+        For Each pingJob As ClsNetJob In netJobs
+            pingJobs.Add(pingJob)
             ' Suppress this message if doing more than a few IPs:
-            If chkVerboseMode.Checked Then LogVerbose("Sending ping (ICMP Echo Request) to " & pingJobs.Last.tgtIp)
+            If chkVerboseMode.Checked Then LogVerbose("Sending ping (ICMP Echo Request) to " & pingJob.TgtIp.ToString)
             Try
-                pingJobs.Last.myPing.SendAsync(tgtIp, myTimeout, pingJobs.Last.tgtIp)
-                AddHandler pingJobs.Last.myPing.PingCompleted, AddressOf GetPingResult
+                pingJob.PingTest.SendAsync(pingJob.TgtIp.ToString, myTimeout, pingJob.TgtIp.ToString)
+                AddHandler pingJob.PingTest.PingCompleted, AddressOf GetPingResult
             Catch ex As Exception
                 LogError(ex)
             End Try
         Next
 
         LogBasic("Ping tests started")
+    End Sub
+
+    Private Sub PrepareNetbiosTest()
+        LogVerbose("Testing for hostnames (NetBIOS test)...")
+
+        For Each nbJob As ClsNetJob In netJobs
+            netbiosJobs.Add(nbJob)
+        Next
+
+        LogVerbose("Netbios test finished")
     End Sub
 
     Private Sub GetPort()
@@ -337,18 +387,15 @@ Public Class Nutcheck
         LogBasic("Preparing TCP tests...")
 
         Dim tcpTestCount As Integer
-        For Each tgtIp As Net.IPAddress In tgtAddresses
+        For Each NetJob As ClsNetJob In netJobs
             For Each tgtPort As Integer In tgtPorts
                 tcpTestCount += 1
-
-                tcpJobs.Add(New ClsTcpJob)
-                tcpJobs.Last.tgtIp = tgtIp.ToString
-                tcpJobs.Last.tgtIpWide = MakeIpWide(tcpJobs.Last.tgtIp)
-                tcpJobs.Last.tgtPort = tgtPort.ToString
-                tcpJobs.Last.tgtPortWide = Strings.Left("     ", 5 - Strings.Len(tgtPort.ToString)) & tgtPort.ToString
-                LogVerbose("Attempting TCP connection with " & tcpJobs.Last.tgtIp & " over port " & tcpJobs.Last.tgtPort)
+                Dim tcpJob = New ClsTcpJob(NetJob)
+                tcpJob.tgtPort = tgtPort
+                tcpJobs.Add(tcpJob)
+                LogVerbose("Attempting TCP connection with " & NetJob.TgtIp.ToString & " over port " & tgtPort.ToString)
                 Try
-                    tcpJobs.Last.tcpClient.ConnectAsync(tgtIp, tgtPort)
+                    tcpJob.tcpClient.ConnectAsync(NetJob.TgtIp, tgtPort)
                 Catch ex As Exception
                     LogError(ex)
                 End Try
@@ -358,34 +405,42 @@ Public Class Nutcheck
         LogBasic("All TCP tests commenced (total: " & tcpTestCount & ")")
     End Sub
 
-    Private Sub DoUdpTest()
-        'LogVerbose("Testing port " & tgtPort & " over TCP...")
+    Private Sub PrepareUdpTest()
+        LogVerbose("Conducting UDP experiments...")
 
+        Dim udpTestCount As Integer
+        For Each netJob As ClsNetJob In netJobs
+            For Each tgtPort As Integer In tgtPorts
+                udpTestCount += 1
+                Dim udpJob = New ClsUdpJob(netJob)
+                udpJob.tgtPort = tgtPort
+                udpJobs.Add(udpJob)
+            Next
+        Next
 
-        'LogVerbose("UDP test finished")
+        LogBasic("All UDP tests commenced (total: " & udpTestCount & ")")
     End Sub
 
     Private Function JobsAllDone() As Boolean
         'Future site of checking if all the tests have been resolved.
-        Return False
+        If pingJobs.Count = 0 And netbiosJobs.Count = 0 And tcpJobs.Count = 0 And udpJobs.Count = 0 Then Return True Else Return False
     End Function
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        'Me.Refresh()
-
         If tcpJobs.Count > 0 Then
-            For Each tcpJob As ClsTcpJob In tcpJobs
-                If tcpJob.tcpClient.Connected Then
-                    LogResult(tcpJob.tgtIpWide & " : " & tcpJob.tgtPortWide & " PORT  OPEN   ( < " & (1 + currentBoredom) * Timer1.Interval & " ms )")
-                    ResetTcpTest(tcpJob.tcpClient)
-                ElseIf currentBoredom > myTimeout / Timer1.Interval Then
-                    If Not chkIgnoreDead.Checked Then LogResult(tcpJob.tgtIpWide & " : " & tcpJob.tgtPortWide & " PORT CLOSED? ( > " & (-1 + currentBoredom) * Timer1.Interval & " ms )")
-                    ResetTcpTest(tcpJob.tcpClient)
-                End If
-            Next
-            ' Removal command must be done outside of foreach by integer countback to prevent failed enumeration error
             For intA As Integer = tcpJobs.Count - 1 To 0 Step -1
-                If tcpJobs(intA).tcpClient.Client Is Nothing Then tcpJobs.Remove(tcpJobs(intA))
+                Dim tcpJob As ClsTcpJob = tcpJobs(intA)
+                If tcpJob.tcpClient.Connected Then
+                    tcpJob.portOpen = True
+                    tcpJob.replyTime = (1 + currentBoredom) * Timer1.Interval
+                    LogResult(MakeIpWide(tcpJob.parent.TgtIp) & " : " & MakePortWide(tcpJob.tgtPort) & " PORT  OPEN   ( < " & tcpJob.replyTime.ToString & " ms )")
+                    KillTcpJob(tcpJob)
+                ElseIf currentBoredom > myTimeout / Timer1.Interval Then
+                    tcpJob.portOpen = False
+                    tcpJob.replyTime = (-1 + currentBoredom) * Timer1.Interval
+                    If Not chkIgnoreDead.Checked Then LogResult(MakeIpWide(tcpJob.parent.TgtIp) & " : " & MakePortWide(tcpJob.tgtPort) & " PORT CLOSED? ( > " & tcpJob.replyTime.ToString & " ms )")
+                    KillTcpJob(tcpJob)
+                End If
             Next
         End If
         If currentBoredom - 1 > myTimeout / Timer1.Interval Or JobsAllDone Then
@@ -401,28 +456,36 @@ Public Class Nutcheck
         End If
     End Sub
 
+    Private Sub KillTcpJob(tcpJob As ClsTcpJob)
+        tcpJob.tcpClient.Close()
+        tcpJob.tcpClient.Dispose()
+        tcpJobs.Remove(tcpJob)
+    End Sub
+
     Private Sub GetPingResult(ByVal sender As Object, ByVal e As System.Net.NetworkInformation.PingCompletedEventArgs)
         ' e.UserState is the UserToken passed to the pingAsync, we will use it to find the matching ping job
-        Dim myPingJob As ClsPingJob = pingJobs.Find(Function(p) p.tgtIp = e.UserState.ToString)
-        myPingJob.roundtripTime = e.Reply.RoundtripTime
+        Dim pingJob As ClsNetJob = pingJobs.Find(Function(p) p.TgtIp.ToString = e.UserState.ToString)
+        pingJob.PingRoundtripTime = e.Reply.RoundtripTime
         'Unused stat:  e.Reply.Buffer.Length.ToString)
 
         If e.Error IsNot Nothing Then
-            myPingJob.errored = True
-            LogVerbose("Error from ping job " & myPingJob.tgtIp & " !")
+            pingJob.PingErrored = True
+            LogBasic("Error from ping job " & pingJob.TgtIp.ToString & " !")
             LogError(e.Error)
         Else
             Select Case e.Reply.Status
                 Case Net.NetworkInformation.IPStatus.Success
-                    myPingJob.successful = True
-                    LogResult(myPingJob.tgtIpWide & " :  ICMP PING REPLY   ( = " & myPingJob.roundtripTime.ToString & " ms )")
+                    pingJob.PingSuccessful = True
+                    LogResult(MakeIpWide(pingJob.TgtIp) & " :  ICMP PING REPLY   ( = " & pingJob.PingRoundtripTime.ToString & " ms )")
                 Case Else
-                    ' successful false by default
-                    If Not chkIgnoreDead.Checked Then LogResult(myPingJob.tgtIpWide & " :  ICMP PING  FAIL   ( = " & myPingJob.roundtripTime.ToString & " ms )")
-                    ' we might want to flag it as errored though depending on the specific reply...?
+                    pingJob.PingSuccessful = False
+                    ' we might also want to flag it as errored though depending on the specific reply...?
+                    If Not chkIgnoreDead.Checked Then LogResult(MakeIpWide(pingJob.TgtIp) & " :  ICMP PING  FAIL   ( = " & pingJob.PingRoundtripTime.ToString & " ms )")
             End Select
 
         End If
+
+        pingJobs.Remove(pingJob)
 
         With DirectCast(sender, Net.NetworkInformation.Ping)
             ' Remove handler because it is no longer needed
@@ -432,10 +495,74 @@ Public Class Nutcheck
         End With
     End Sub
 
-    Private Sub ResetTcpTest(tcpJob As Net.Sockets.TcpClient)
-        ' RESET SOCKET
-        tcpJob.Close()
-        tcpJob.Dispose()
+    Private Sub DoFullPrettyLog() ' Formerly "LogOrganizedReport"
+        Dim lotsOfEquals As String = ""
+        Dim addPing As String = ""
+        Dim addNetbios As String = ""
+        Dim portList As String = ""
+        If chkPing.Checked Then
+            lotsOfEquals &= "===="
+            addPing = " P |"
+        End If
+        If chkNetbios.Checked Then
+            lotsOfEquals &= "=========="
+            addNetbios = " NETBIOS |"
+        End If
+        If chkTcp.Checked Then
+            For intA As Integer = 0 To tgtPorts.Count - 1
+                lotsOfEquals &= "======"
+                portList &= MakePortWide(tgtPorts(intA)) & "|"
+            Next
+        End If
+        LogPretty("  Organized scan summary:")
+        LogPretty("=================" & lotsOfEquals)
+        LogPretty("| IP  ADDRESESS |" & addPing & addNetbios & portList)
+        LogPretty("=================" & lotsOfEquals)
+        Dim pingResult As String = ""
+        Dim netBios As String = ""
+        Dim portResults As String = ""
+        Dim canIgnoreJob As Boolean = True
+        For Each netJob As ClsNetJob In netJobs
+            canIgnoreJob = True
+            portResults = ""
+            If chkPing.Checked Then
+                If netJob.PingSuccessful Then pingResult = " ! |" : canIgnoreJob = False Else pingResult = "   |"
+            End If
+            If chkNetbios.Checked Then
+                If netJob.Hostname = "" Then netBios = " ? ? ? ? |" Else netBios = Strings.Left(netJob.Hostname, 9) & "|" : canIgnoreJob = False
+            End If
+            If chkTcp.Checked Or chkUdp.Checked Then
+                For intA As Integer = 0 To tgtPorts.Count - 1
+                    portResults &= " "
+                    If chkTcp.Checked Then
+                        If netJob.TcpJobs(intA).portOpen Then
+                            portResults &= "T"
+                            canIgnoreJob = False
+                        Else
+                            portResults &= " "
+                        End If
+                    Else
+                        portResults &= "."
+                    End If
+                    portResults &= " "
+                    If chkUdp.Checked Then
+                        If netJob.UdpJobs(intA).portReplied Then
+                            portResults &= "U"
+                            canIgnoreJob = False
+                        Else
+                            portResults &= " "
+                        End If
+                    Else
+                        portResults &= "."
+                    End If
+                    portResults &= " |"
+                Next
+            End If
+            If Not chkIgnoreDead.Checked Or canIgnoreJob = False Then LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults)
+        Next
+        LogPretty("=================" & lotsOfEquals)
+        LogPretty("  ( '.' denotes untested ) ")
+        LogPretty("  End of log.")
     End Sub
 
     Private Sub lblAbout_Click(sender As Object, e As EventArgs) Handles lblAbout.Click
@@ -444,14 +571,6 @@ Public Class Nutcheck
 
     Private Sub chkTcp_CheckedChanged(sender As Object, e As EventArgs)
         MsgBox(chkTcp.Checked)
-    End Sub
-
-    Private Sub btnDebugTest_Click(sender As Object, e As EventArgs) Handles btnPreset1.Click
-        Dim tgtIpAddress As Net.IPAddress = Net.IPAddress.Parse("192.168.1.1")
-        tgtAddresses.Add(tgtIpAddress)
-        tgtPorts.Add(80)
-        PrepareTcpTests()
-        Timer1.Enabled = True
     End Sub
 
     Private Sub btnReset_Click(sender As Object, e As EventArgs) Handles btnReset.Click
