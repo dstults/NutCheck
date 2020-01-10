@@ -1,2 +1,2 @@
 # NutCheck
- An IP and port scanning tool
+ An IP pinging and port scanning tool
