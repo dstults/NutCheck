@@ -7,7 +7,7 @@ Public Class Nutcheck
 
 #Region "Declarations"
 
-    Public programNameWithVersion As String = "NutCheck v0.90"
+    Public programNameWithVersion As String = "NutCheck v0.91"
 
     Public Class ClsTcpJob
         Public parent As ClsNetJob
@@ -45,8 +45,8 @@ Public Class Nutcheck
 
         Public Hostname As String = ""
 
-        Public TcpJobs As New HashSet(Of ClsTcpJob)
-        Public UdpJobs As New HashSet(Of ClsUdpJob)
+        Public TcpJobs As New List(Of ClsTcpJob)
+        Public UdpJobs As New List(Of ClsUdpJob)
 
         Public Sub New(setIp As Net.IPAddress)
             TgtIp = setIp
@@ -54,9 +54,10 @@ Public Class Nutcheck
 
     End Class
 
-    Public tgtPorts As New HashSet(Of Integer)
-    Private currentBoredom As Integer = 0
-    Private myTimeout As Integer = 2000 ' ms until I abort
+    Public tgtPorts As New SortedSet(Of Integer)
+    Public hitPorts As New SortedSet(Of Integer)
+    Public currentBoredom As Integer = 0
+    Public myTimeout As Integer = 2000 ' ms until I abort
 
     Public netJobs As New List(Of ClsNetJob)
     Public pingJobs As New List(Of ClsNetJob)
@@ -80,7 +81,7 @@ Public Class Nutcheck
         btnPreset2.Enabled = True
         btnPreset3.Enabled = True
         btnPreset4.Enabled = True
-        btnReset.enabled = False
+        btnReset.Enabled = False
 
         Timer1.Enabled = False
         lblSpinner.Text = "-"
@@ -91,11 +92,12 @@ Public Class Nutcheck
         txtResults.Text = ""
         txtOrganizedResults.Text = ""
         tgtPorts.Clear()
+        hitPorts.Clear()
         netJobs.Clear()
-        pingJobs.clear()
-        netbiosJobs.clear()
+        pingJobs.Clear()
+        netbiosJobs.Clear()
         tcpJobs.Clear()
-        udpJobs.clear()
+        udpJobs.Clear()
 
     End Sub
 
@@ -135,7 +137,7 @@ Public Class Nutcheck
 
         LogVerbose("Work complete!")
         LogResult(vbNewLine & "No more active tests remaining.")
-        DoFullPrettyLog
+        DoFullPrettyLog()
 
     End Sub
 
@@ -144,10 +146,10 @@ Public Class Nutcheck
         Dim octets As List(Of Byte) = anIp.GetAddressBytes.ToList
         'Return Format(CInt(octets(0)), "000") & "." & Format(CInt(octets(1)), "000") & "." & Format(CInt(octets(2)), "000") & "." & Format(CInt(octets(3)), "000")
         Return Strings.Left("  ",
-                            3 - Strings.Len(octets(0).ToString)) & octets(0).ToString & "." & Strings.Left("  ",
-                            3 - Strings.Len(octets(1).ToString)) & octets(1).ToString & "." & Strings.Left("  ",
-                            3 - Strings.Len(octets(2).ToString)) & octets(2).ToString & "." & Strings.Left("  ",
-                            3 - Strings.Len(octets(3).ToString)) & octets(3).ToString
+                        3 - Strings.Len(octets(0).ToString)) & octets(0).ToString & "." & Strings.Left("  ",
+                        3 - Strings.Len(octets(1).ToString)) & octets(1).ToString & "." & Strings.Left("  ",
+                        3 - Strings.Len(octets(2).ToString)) & octets(2).ToString & "." & Strings.Left("  ",
+                        3 - Strings.Len(octets(3).ToString)) & octets(3).ToString
     End Function
 
     Public Function MakePortWide(aPort As Integer) As String
@@ -435,6 +437,7 @@ Public Class Nutcheck
                 Dim tcpJob As ClsTcpJob = tcpJobs(intA)
                 If tcpJob.tcpClient.Connected Then
                     tcpJob.portOpen = True
+                    If Not hitPorts.Contains(tcpJob.tgtPort) Then hitPorts.Add(tcpJob.tgtPort)
                     tcpJob.replyTime = (1 + currentBoredom) * Timer1.Interval
                     LogResult(MakeIpWide(tcpJob.parent.TgtIp) & " : " & MakePortWide(tcpJob.tgtPort) & " PORT  OPEN   ( < " & tcpJob.replyTime.ToString & " ms )")
                     KillTcpJob(tcpJob)
@@ -446,7 +449,7 @@ Public Class Nutcheck
                 End If
             Next
         End If
-        If currentBoredom - 1 > myTimeout / Timer1.Interval Or JobsAllDone Then
+        If currentBoredom - 1 > myTimeout / Timer1.Interval Or JobsAllDone() Then
             Form_Work_End()
         Else
             currentBoredom += 1
@@ -512,9 +515,9 @@ Public Class Nutcheck
             addNetbios = " NETBIOS |"
         End If
         If chkTcp.Checked Then
-            For intA As Integer = 0 To tgtPorts.Count - 1
+            For intA As Integer = 0 To hitPorts.Count - 1
                 lotsOfEquals &= "======"
-                portList &= MakePortWide(tgtPorts(intA)) & "|"
+                portList &= MakePortWide(hitPorts(intA)) & "|"
             Next
         End If
         LogPretty("  Organized scan summary:")
@@ -525,6 +528,7 @@ Public Class Nutcheck
         Dim netBios As String = ""
         Dim portResults As String = ""
         Dim canIgnoreJob As Boolean = True
+        Dim ignoredIps As New HashSet(Of String)
         For Each netJob As ClsNetJob In netJobs
             canIgnoreJob = True
             portResults = ""
@@ -535,10 +539,10 @@ Public Class Nutcheck
                 If netJob.Hostname = "" Then netBios = " ? ? ? ? |" Else netBios = Strings.Left(netJob.Hostname, 9) & "|" : canIgnoreJob = False
             End If
             If chkTcp.Checked Or chkUdp.Checked Then
-                For intA As Integer = 0 To tgtPorts.Count - 1
+                For Each hitPort As Integer In hitPorts
                     portResults &= " "
                     If chkTcp.Checked Then
-                        If netJob.TcpJobs(intA).portOpen Then
+                        If netJob.TcpJobs.Find(Function(p) p.tgtPort = hitPort).portOpen Then
                             portResults &= "T"
                             canIgnoreJob = False
                         Else
@@ -549,7 +553,7 @@ Public Class Nutcheck
                     End If
                     portResults &= " "
                     If chkUdp.Checked Then
-                        If netJob.UdpJobs(intA).portReplied Then
+                        If netJob.UdpJobs.Find(Function(p) p.tgtPort = hitPort).portReplied Then
                             portResults &= "U"
                             canIgnoreJob = False
                         Else
@@ -561,10 +565,34 @@ Public Class Nutcheck
                     portResults &= " |"
                 Next
             End If
-            If Not chkIgnoreDead.Checked Or canIgnoreJob = False Then LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults)
+            If canIgnoreJob = False Then LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults) Else ignoredIps.Add(netJob.TgtIp.ToString)
         Next
         LogPretty("=================" & lotsOfEquals)
-        LogPretty("  ( '.' denotes untested ) ")
+        If ignoredIps.Count > 0 Then
+            LogPretty("The following IPs were omitted due to no contact:")
+            Dim logOut As String = "  " & ignoredIps.First
+            If ignoredIps.Count > 1 Then
+                For intA As Integer = 1 To ignoredIps.Count - 1
+                    logOut &= ", " & ignoredIps(intA)
+                Next
+            End If
+            LogPretty(logOut)
+        End If
+        If hitPorts.Count < tgtPorts.Count Then
+            Dim ignoredPorts As New HashSet(Of Integer)
+            For Each testPort As Integer In tgtPorts
+                If Not hitPorts.Contains(testPort) Then ignoredPorts.Add(testPort)
+            Next
+            LogPretty("The following ports were omitted due to no contact:")
+            Dim logOut As String = "  " & ignoredPorts.First.ToString
+            If ignoredPorts.Count > 1 Then
+                For intA As Integer = 1 To ignoredPorts.Count - 1
+                    logOut &= ", " & ignoredPorts(intA).ToString
+                Next
+            End If
+            LogPretty(logOut)
+        End If
+        LogPretty("")
         LogPretty("  End of log.")
     End Sub
 
