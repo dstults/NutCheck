@@ -396,6 +396,7 @@ Partial Class Nutcheck
         Me.Controls.Add(Me.chkHostname)
         Me.DoubleBuffered = True
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
+        Me.MaximizeBox = False
         Me.Name = "Nutcheck"
         Me.Text = "Darren's Nutcheck"
         Me.ResumeLayout(False)
