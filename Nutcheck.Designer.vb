@@ -52,7 +52,7 @@ Partial Class Nutcheck
         Me.chkIgnoreDead = New System.Windows.Forms.CheckBox()
         Me.chkVerboseMode = New System.Windows.Forms.CheckBox()
         Me.Label5 = New System.Windows.Forms.Label()
-        Me.chkNetbios = New System.Windows.Forms.CheckBox()
+        Me.chkHostname = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'btnTest
@@ -169,10 +169,12 @@ Partial Class Nutcheck
         '
         'lblSpinner
         '
+        Me.lblSpinner.BackColor = System.Drawing.Color.Yellow
         Me.lblSpinner.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.lblSpinner.Location = New System.Drawing.Point(284, 125)
+        Me.lblSpinner.Font = New System.Drawing.Font("Courier New", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblSpinner.Location = New System.Drawing.Point(326, 85)
         Me.lblSpinner.Name = "lblSpinner"
-        Me.lblSpinner.Size = New System.Drawing.Size(23, 23)
+        Me.lblSpinner.Size = New System.Drawing.Size(222, 37)
         Me.lblSpinner.TabIndex = 36
         Me.lblSpinner.Text = "-"
         Me.lblSpinner.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -347,22 +349,23 @@ Partial Class Nutcheck
         Me.Label5.Text = "Ex: 192.168.1.1, 192.168.0.0/24, yourfavoritedomain.com"
         Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'chkNetbios
+        'chkHostname
         '
-        Me.chkNetbios.AutoSize = True
-        Me.chkNetbios.Enabled = False
-        Me.chkNetbios.Location = New System.Drawing.Point(38, 29)
-        Me.chkNetbios.Name = "chkNetbios"
-        Me.chkNetbios.Size = New System.Drawing.Size(124, 17)
-        Me.chkNetbios.TabIndex = 56
-        Me.chkNetbios.Text = "NetBios Query (WIP)"
-        Me.chkNetbios.UseVisualStyleBackColor = True
+        Me.chkHostname.AutoSize = True
+        Me.chkHostname.Enabled = False
+        Me.chkHostname.Location = New System.Drawing.Point(38, 29)
+        Me.chkHostname.Name = "chkHostname"
+        Me.chkHostname.Size = New System.Drawing.Size(109, 17)
+        Me.chkHostname.TabIndex = 56
+        Me.chkHostname.Text = "Hostnames (WIP)"
+        Me.chkHostname.UseVisualStyleBackColor = True
         '
         'Nutcheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1152, 591)
+        Me.Controls.Add(Me.lblSpinner)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.chkVerboseMode)
         Me.Controls.Add(Me.chkIgnoreDead)
@@ -377,7 +380,6 @@ Partial Class Nutcheck
         Me.Controls.Add(Me.btnPreset1)
         Me.Controls.Add(Me.lblPortExample)
         Me.Controls.Add(Me.txtResults)
-        Me.Controls.Add(Me.lblSpinner)
         Me.Controls.Add(Me.txtLog)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.lblAbout)
@@ -391,7 +393,7 @@ Partial Class Nutcheck
         Me.Controls.Add(Me.chkPing)
         Me.Controls.Add(Me.chkTcp)
         Me.Controls.Add(Me.chkUdp)
-        Me.Controls.Add(Me.chkNetbios)
+        Me.Controls.Add(Me.chkHostname)
         Me.DoubleBuffered = True
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
         Me.Name = "Nutcheck"
@@ -430,5 +432,5 @@ Partial Class Nutcheck
     Friend WithEvents chkIgnoreDead As CheckBox
     Friend WithEvents chkVerboseMode As CheckBox
     Friend WithEvents Label5 As Label
-    Friend WithEvents chkNetbios As CheckBox
+    Friend WithEvents chkHostname As CheckBox
 End Class

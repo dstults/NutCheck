@@ -7,7 +7,8 @@ Public Class Nutcheck
 
 #Region "Declarations"
 
-    Public programNameWithVersion As String = "NutCheck v0.92"
+    Public programNameWithVersion As String = "NutCheck v0.94"
+    Public lastMajorRevisionDate As String = "2020/01/11"
 
     Public Class ClsTcpJob
         Public parent As ClsNetJob
@@ -15,9 +16,10 @@ Public Class Nutcheck
         Public tcpClient As New Net.Sockets.TcpClient
         Public portOpen As Boolean
         Public replyTime As Integer
-        Public Sub New(setParent As ClsNetJob)
+        Public Sub New(setParent As ClsNetJob, setPort As Integer)
             parent = setParent
             parent.TcpJobs.Add(Me)
+            tgtPort = setPort
         End Sub
 
     End Class
@@ -27,9 +29,10 @@ Public Class Nutcheck
         Public udpClient As New Net.Sockets.UdpClient
         Public portReplied As Boolean
         Public replyTime As Integer
-        Public Sub New(setParent As ClsNetJob)
+        Public Sub New(setParent As ClsNetJob, setPort As Integer)
             parent = setParent
             parent.UdpJobs.Add(Me)
+            tgtPort = setPort
         End Sub
 
     End Class
@@ -58,17 +61,17 @@ Public Class Nutcheck
     Public hitPorts As New SortedSet(Of Integer)
     Public currentBoredom As Integer = 0
     Public myTimeout As Integer = 2000 ' ms until I abort
+    Public thisScanDnsServer As String = ""
 
     Public netJobs As New List(Of ClsNetJob)
     Public pingJobs As New List(Of ClsNetJob)
-    Public netbiosJobs As New List(Of ClsNetJob)
+    Public hostnameJobs As New List(Of ClsNetJob)
     Public tcpJobs As New List(Of ClsTcpJob)
     Public udpJobs As New List(Of ClsUdpJob)
 
 #End Region
 
 #Region "Startup, Resets, Shared Functions"
-
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
         txtTgtAddresses.Text = myIpAddress & "/" & subnetMask
@@ -134,17 +137,19 @@ Public Class Nutcheck
 
         Timer1.Enabled = False
         lblSpinner.Text = "-"
+        lblSpinner.BackColor = Color.Yellow
         lblSpinner.Visible = False
 
         ' CLEAR DATA
         txtLog.Text = "Welcome to Darren's " & programNameWithVersion & "!" & vbNewLine & vbNewLine & "Check for updates at: https://github.com/DranKof/NutCheck/releases"
         txtResults.Text = ""
         txtOrganizedResults.Text = ""
+        thisScanDnsServer = ""
         tgtPorts.Clear()
         hitPorts.Clear()
         netJobs.Clear()
         pingJobs.Clear()
-        netbiosJobs.Clear()
+        hostnameJobs.Clear()
         tcpJobs.Clear()
         udpJobs.Clear()
 
@@ -182,7 +187,8 @@ Public Class Nutcheck
 
         Timer1.Enabled = False
         lblSpinner.Visible = True
-        lblSpinner.Text = "!"
+        lblSpinner.Text = "😃"
+        lblSpinner.BackColor = Color.Lime
 
         LogVerbose("Work complete!")
         LogResult(vbNewLine & "No more active tests remaining.")
@@ -236,6 +242,7 @@ Public Class Nutcheck
 #End Region
 
     Private Sub BtnTest_Click(sender As Object, e As EventArgs) Handles btnTest.Click
+        If chkHostname.Checked Then ConfirmScanHostnames()
         ' RESET & START PROCESS
         Form_Work_Begin()
 
@@ -243,8 +250,8 @@ Public Class Nutcheck
             GetTestTimeout()
             GetIPAddresses()
             If netJobs.Count > 0 Then
-                If chkPing.Checked Then DoPingTest() Else LogBasic("Ping test skipped!")
-                If chkNetbios.Checked Then PrepareNetbiosTest() Else LogBasic("NetBIOS test skipped!")
+                If chkPing.Checked Then PreparePingTest() Else LogBasic("Ping test skipped!")
+                If chkHostname.Checked Then PrepareHostnameQueries() Else LogBasic("Hostname test skipped!")
                 If chkTcp.Checked Or chkUdp.Checked Then GetPort()
                 If chkTcp.Checked Then PrepareTcpTests() Else LogBasic("TCP test skipped!")
                 If chkUdp.Checked Then PrepareUdpTest() Else LogBasic("UDP test skipped!")
@@ -292,6 +299,16 @@ Public Class Nutcheck
         Next
 
         LogBasic("IP address acquisition finished: " & netJobs.Count & " ips added")
+    End Sub
+
+    Private Sub ConfirmScanHostnames()
+        Dim ReallyScanHostnames As MsgBoxResult = MsgBox("Warning: Hostname lookups are not fully operational (and won't be any time soon -- .Net doesn't natively support anything that works well)." & vbNewLine & vbNewLine & "There are still a couple fringe cases where you might actually want to use it, but it hasn't been optimized and it will lag, a lot." & vbNewLine & vbNewLine & "Are you sure you want to enable hostname lookups?", MsgBoxStyle.YesNo)
+        Select Case ReallyScanHostnames
+            Case MsgBoxResult.Yes
+                ' do nothing
+            Case MsgBoxResult.No
+                chkHostname.Checked = False
+        End Select
     End Sub
 
     Private Sub GetIPAddress_MaskedGroup(ipAndMask As String())
@@ -379,7 +396,6 @@ Public Class Nutcheck
         Catch ex As Exception
             LogError(ex)
             LogBasic("DNS resolution: Failed to resolve host '" & domainRaw & "', terminating test prematurely")
-            getIpSuccess = False
         End Try
 
         If DNSLookup IsNot Nothing Then
@@ -404,8 +420,8 @@ Public Class Nutcheck
         Return getIpSuccess
     End Function
 
-    Private Sub DoPingTest()
-        LogBasic("Attempting ping operation...")
+    Private Sub PreparePingTest()
+        LogBasic("Launching ping operations...")
 
         Dim pingTestCount As Integer
         For Each pingJob As ClsNetJob In netJobs
@@ -424,14 +440,26 @@ Public Class Nutcheck
         LogBasic("Ping tests started: " & pingTestCount.ToString)
     End Sub
 
-    Private Sub PrepareNetbiosTest()
-        'LogVerbose("Testing for hostnames (NetBIOS test)...")
+    Private Sub PrepareHostnameQueries()
+        LogVerbose("Checking conditions for hostname lookup tests...")
 
-        'For Each nbJob As ClsNetJob In netJobs
-        'If nbJob.Hostname = "" Then netbiosJobs.Add(nbJob)
-        'Next
+        If dns1 <> "" Then
+            thisScanDnsServer = dns1
+            LogBasic("Attempting to use DNS to scan machine names.")
+        ElseIf myGateway <> "" Then
+            thisScanDnsServer = myGateway
+            LogBasic("No DNSs set, will attempt to use gateway to query hostnames.")
+        ElseIf myGateway = "" And dns1 = "" And chkTcp.Checked Then
+            If Not tgtPorts.Contains(53) Then
+                thisScanDnsServer = "Port 53"
+                LogBasic("Including DNS port scan (53) to aid in detection of hostnames.")
+                tgtPorts.Add(53)
+            End If
+        ElseIf myGateway = "" And dns1 = "" And Not chkTcp.Checked Then
+            LogBasic("Cannot perform hostname scan without a gateway, dns or enabled tcp port scan.")
+        End If
 
-        'LogVerbose("Netbios test finished")
+        LogVerbose("hostname scan prep checks finished")
     End Sub
 
     Private Sub GetPort()
@@ -471,8 +499,7 @@ Public Class Nutcheck
         For Each NetJob As ClsNetJob In netJobs
             For Each tgtPort As Integer In tgtPorts
                 tcpTestCount += 1
-                Dim tcpJob = New ClsTcpJob(NetJob)
-                tcpJob.tgtPort = tgtPort
+                Dim tcpJob = New ClsTcpJob(NetJob, tgtPort)
                 tcpJobs.Add(tcpJob)
                 LogVerbose("Attempting TCP connection with " & NetJob.TgtIp.ToString & " over port " & tgtPort.ToString)
                 Try
@@ -493,8 +520,7 @@ Public Class Nutcheck
         For Each netJob As ClsNetJob In netJobs
             For Each tgtPort As Integer In tgtPorts
                 udpTestCount += 1
-                Dim udpJob = New ClsUdpJob(netJob)
-                udpJob.tgtPort = tgtPort
+                Dim udpJob = New ClsUdpJob(netJob, tgtPort)
                 udpJobs.Add(udpJob)
             Next
         Next
@@ -504,7 +530,7 @@ Public Class Nutcheck
 
     Private Function JobsAllDone() As Boolean
         'Future site of checking if all the tests have been resolved.
-        If pingJobs.Count = 0 And netbiosJobs.Count = 0 And tcpJobs.Count = 0 And udpJobs.Count = 0 Then Return True Else Return False
+        If pingJobs.Count = 0 And hostnameJobs.Count = 0 And tcpJobs.Count = 0 And udpJobs.Count = 0 Then Return True Else Return False
     End Function
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
@@ -525,19 +551,19 @@ Public Class Nutcheck
                 End If
             Next
         End If
-        If netbiosJobs.Count > 0 Then
-            For intA As Integer = netbiosJobs.Count - 1 To 0 Step -1
-                Dim nbJob As ClsNetJob = netJobs(intA)
-                If nbJob.Hostname = "" Then
+        If hostnameJobs.Count > 0 Then
+            For intA As Integer = hostnameJobs.Count - 1 To 0 Step -1
+                Dim hnJob As ClsNetJob = netJobs(intA)
+                If hnJob.Hostname = "" Then
                     Try
-                        nbJob.Hostname = Net.Dns.GetHostEntry(nbJob.TgtIp).HostName
-                        LogBasic(MakeIpWide(nbJob.TgtIp) & " hostname: " & nbJob.Hostname)
+                        hnJob.Hostname = Net.Dns.GetHostEntry(hnJob.TgtIp).HostName
+                        LogBasic(MakeIpWide(hnJob.TgtIp) & " hostname: " & hnJob.Hostname)
                     Catch ex As Exception
                         LogError(ex)
-                        nbJob.Hostname = "-"
+                        hnJob.Hostname = "-"
                     End Try
                 End If
-                netbiosJobs.Remove(nbJob)
+                hostnameJobs.Remove(hnJob)
             Next
         End If
         If currentBoredom - 1 > myTimeout / Timer1.Interval Or JobsAllDone() Then
@@ -574,7 +600,7 @@ Public Class Nutcheck
                 Case Net.NetworkInformation.IPStatus.Success
                     pingJob.PingSuccessful = True
                     LogResult(MakeIpWide(pingJob.TgtIp) & " :  ICMP PING REPLY   ( = " & pingJob.PingRoundtripTime.ToString & " ms )")
-                    If chkNetbios.Checked And pingJob.Hostname = "" Then netbiosJobs.Add(pingJob)
+                    If chkHostname.Checked And pingJob.Hostname = "" Then hostnameJobs.Add(pingJob)
                 Case Else
                     pingJob.PingSuccessful = False
                     ' we might also want to flag it as errored though depending on the specific reply...?
@@ -594,17 +620,19 @@ Public Class Nutcheck
     End Sub
 
     Private Sub DoFullPrettyLog() ' Formerly "LogOrganizedReport"
+        'lblSpinner.BackColor = Color.LightPink
+        'lblSpinner.Text = "GENERATING REPORT"
         Dim lotsOfEquals As String = ""
         Dim addPing As String = ""
-        Dim addNetbios As String = ""
+        Dim addHostname As String = ""
         Dim portList As String = ""
         If chkPing.Checked Then
             lotsOfEquals &= "===="
             addPing = " P |"
         End If
-        If chkNetbios.Checked Then
+        If chkHostname.Checked Then
             lotsOfEquals &= "=========="
-            addNetbios = " NETBIOS |"
+            addHostname = "HOSTNAME |"
         End If
         If chkTcp.Checked Then
             For intA As Integer = 0 To hitPorts.Count - 1
@@ -614,10 +642,10 @@ Public Class Nutcheck
         End If
         LogPretty("  Organized scan summary:")
         LogPretty("=================" & lotsOfEquals)
-        LogPretty("| IP  ADDRESESS |" & addPing & addNetbios & portList)
+        LogPretty("| IP  ADDRESESS |" & addPing & addHostname & portList)
         LogPretty("=================" & lotsOfEquals)
         Dim pingResult As String = ""
-        Dim netBios As String = ""
+        Dim hostname As String = ""
         Dim portResults As String = ""
         Dim canIgnoreJob As Boolean = True
         Dim ignoredIps As New HashSet(Of String)
@@ -627,8 +655,8 @@ Public Class Nutcheck
             If chkPing.Checked Then
                 If netJob.PingSuccessful Then pingResult = " ! |" : canIgnoreJob = False Else pingResult = "   |"
             End If
-            If chkNetbios.Checked Then
-                If netJob.Hostname = "-" Or netJob.Hostname = "" Then netBios = " ? ? ? ? |" Else netBios = Strings.Left(netJob.Hostname & "         ", 9) & "|" : canIgnoreJob = False
+            If chkHostname.Checked Then
+                If netJob.Hostname = "-" Or netJob.Hostname = "" Then hostname = " ? ? ? ? |" Else hostname = Strings.Left(netJob.Hostname & "         ", 9) & "|" : canIgnoreJob = False
             End If
             If chkTcp.Checked Or chkUdp.Checked Then
                 For Each hitPort As Integer In hitPorts
@@ -659,10 +687,10 @@ Public Class Nutcheck
             End If
             If netJob.TgtIp.ToString = myIpAddress Then
                 canIgnoreJob = False
-                LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults & "<--Me")
+                LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & hostname & portResults & "<--Me")
             Else
                 If canIgnoreJob = False Then
-                    LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & netBios & portResults)
+                    LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & hostname & portResults)
                 Else
                     ignoredIps.Add(netJob.TgtIp.ToString)
                 End If
@@ -697,15 +725,26 @@ Public Class Nutcheck
         LogPretty("  End of log.")
     End Sub
 
-    Private Sub lblAbout_Click(sender As Object, e As EventArgs) Handles lblAbout.Click
-        MsgBox(programNameWithVersion & vbNewLine & "by Darren Stults (drankof@gmail.com)" & vbNewLine & "1/8/2020" & vbNewLine & "Check for updates at:" & vbNewLine & "https://github.com/DranKof/NutCheck/releases")
+    Private Sub LblAbout_Click(sender As Object, e As EventArgs) Handles lblAbout.Click
+        MsgBox(programNameWithVersion & vbNewLine & "by Darren Stults (drankof@gmail.com)" & vbNewLine & lastMajorRevisionDate & vbNewLine & "Check for updates at:" & vbNewLine & "https://github.com/DranKof/NutCheck/releases")
     End Sub
 
-    Private Sub chkTcp_CheckedChanged(sender As Object, e As EventArgs)
+    Private Sub ChkTcp_CheckedChanged(sender As Object, e As EventArgs)
         MsgBox(chkTcp.Checked)
     End Sub
 
-    Private Sub btnReset_Click(sender As Object, e As EventArgs) Handles btnReset.Click
+    Private Sub BtnReset_Click(sender As Object, e As EventArgs) Handles btnReset.Click
         Form_Reset()
     End Sub
+
+    Private Sub ChkPing_CheckedChanged(sender As Object, e As EventArgs) Handles chkPing.CheckedChanged
+        Select Case chkPing.Checked
+            Case True
+                chkHostname.Enabled = True
+            Case False
+                chkHostname.Enabled = False
+                chkHostname.Checked = False
+        End Select
+    End Sub
+
 End Class
