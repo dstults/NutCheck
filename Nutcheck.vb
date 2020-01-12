@@ -427,7 +427,6 @@ Public Class Nutcheck
         For Each pingJob As ClsNetJob In netJobs
             pingTestCount += 1
             pingJobs.Add(pingJob)
-            ' Suppress this message if doing more than a few IPs:
             If chkVerboseMode.Checked Then LogVerbose("Sending ping (ICMP Echo Request) to " & pingJob.TgtIp.ToString)
             Try
                 pingJob.PingTest.SendAsync(pingJob.TgtIp.ToString, myTimeout, pingJob.TgtIp.ToString)
