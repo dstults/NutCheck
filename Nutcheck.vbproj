@@ -6,9 +6,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{734ED5D9-092D-4AF9-B159-9D666A08CEED}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>Nutcheck.My.MyApplication</StartupObject>
-    <RootNamespace>Nutcheck</RootNamespace>
-    <AssemblyName>Nutcheck</AssemblyName>
+    <StartupObject>NutCheck.My.MyApplication</StartupObject>
+    <RootNamespace>NutCheck</RootNamespace>
+    <AssemblyName>NutCheck</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Nutcheck.xml</DocumentationFile>
+    <DocumentationFile>NutCheck.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,7 +32,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Nutcheck.xml</DocumentationFile>
+    <DocumentationFile>NutCheck.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -73,11 +73,11 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Nutcheck.vb">
+    <Compile Include="frmNutCheck.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nutcheck.Designer.vb">
-      <DependentUpon>Nutcheck.vb</DependentUpon>
+    <Compile Include="frmNutCheck.Designer.vb">
+      <DependentUpon>frmNutCheck.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -97,8 +97,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Nutcheck.resx">
-      <DependentUpon>Nutcheck.vb</DependentUpon>
+    <EmbeddedResource Include="frmNutCheck.resx">
+      <DependentUpon>frmNutCheck.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

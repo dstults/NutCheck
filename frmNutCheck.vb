@@ -3,7 +3,7 @@
 
 'Imports System.Net.NetworkInformation
 
-Public Class Nutcheck
+Public Class FrmNutCheck
 
 #Region "Declarations"
 
