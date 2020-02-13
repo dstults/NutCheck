@@ -180,15 +180,6 @@ Public Class FrmNutCheck
         txtLog.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
         txtResults.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
         txtOrganizedResults.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
-        txtOrganizedResults.Text &= "IP Scan Input: " & txtTgtAddresses.Text & vbNewLine
-        txtOrganizedResults.Text &= "Port Scan Input: " & txtPorts.Text & vbNewLine
-        txtOrganizedResults.Text &= "Timeout: " & txtTimeout.Text & vbNewLine
-        Dim testList As String = ""
-        If chkPing.Checked Then testList &= " PING"
-        If chkHostname.Checked Then testList &= " HOSTNAME"
-        If chkTcp.Checked Then testList &= " TCP"
-        If chkUdp.Checked Then testList &= " UDP"
-        txtOrganizedResults.Text &= "Tests Conducted:" & testList & vbNewLine & vbNewLine
         currentBoredom = 0
 
     End Sub
@@ -658,21 +649,25 @@ Public Class FrmNutCheck
                 portList &= MakePortWide(hitPorts(intA)) & "|"
             Next
         End If
-        LogPretty("  Organized scan summary:")
-        LogPretty("")
-        LogPretty("=================" & lotsOfEquals)
-        LogPretty("| IP  ADDRESESS |" & addPing & addHostname & portList)
-        LogPretty("=================" & lotsOfEquals)
         Dim pingResult As String = ""
         Dim hostname As String = ""
         Dim portResults As String = ""
         Dim canIgnoreJob As Boolean = True
+        Dim hitPings As Integer
+        'Dim hitPorts(65535) As Integer
+        Dim hitIPs As New HashSet(Of String)
         Dim ignoredIps As New HashSet(Of String)
         For Each netJob As ClsNetJob In netJobs
             canIgnoreJob = True
             portResults = ""
             If chkPing.Checked Then
-                If netJob.PingSuccessful Then pingResult = " ! |" : canIgnoreJob = False Else pingResult = "   |"
+                If netJob.PingSuccessful Then
+                    hitPings += 1
+                    pingResult = " ! |"
+                    canIgnoreJob = False
+                Else
+                    pingResult = "   |"
+                End If
             End If
             If chkHostname.Checked Then
                 If netJob.Hostname = "-" Or netJob.Hostname = "" Then hostname = " ? ? ? ? |" Else hostname = Strings.Left(netJob.Hostname & "         ", 9) & "|" : canIgnoreJob = False
@@ -706,19 +701,33 @@ Public Class FrmNutCheck
             End If
             If netJob.TgtIp.ToString = myIpAddress Then
                 canIgnoreJob = False
-                LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & hostname & portResults & "<--Me")
+                hitIPs.Add("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & hostname & portResults & "<--Me")
             Else
                 If canIgnoreJob = False Then
-                    LogPretty("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & hostname & portResults)
+                    hitIPs.Add("|" & MakeIpWide(netJob.TgtIp) & "|" & pingResult & hostname & portResults)
                 Else
                     ignoredIps.Add(netJob.TgtIp.ToString)
                 End If
             End If
         Next
-        LogPretty("=================" & lotsOfEquals)
+
+        LogPretty("  Scan Input -")
+        LogPretty("  - IP Scan Input: " & txtTgtAddresses.Text)
+        LogPretty("  - Port Scan Input: " & txtPorts.Text)
+        LogPretty("  - Timeout: " & txtTimeout.Text)
+        Dim testList As String = ""
+        If chkPing.Checked Then testList &= " PING"
+        If chkHostname.Checked Then testList &= " HOSTNAME"
+        If chkTcp.Checked Then testList &= " TCP"
+        If chkUdp.Checked Then testList &= " UDP"
+        LogPretty("  - Tests Conducted:" & testList)
+        LogPretty("")
+        LogPretty("  Scan Result Summary -")
+        LogPretty("  - Hosts Discovered: " & hitIPs.Count)
+        LogPretty("  - Ping Replies: " & hitPings)
         If ignoredIps.Count > 0 Then
             If ignoredIps.Count <= 32 Then
-                LogPretty("The following IPs were omitted due to no contact:")
+                LogPretty("  - The following IPs were omitted due to no contact:")
                 Dim logOut As String = "  " & ignoredIps.First
                 If ignoredIps.Count > 1 Then
                     For intA As Integer = 1 To ignoredIps.Count - 1
@@ -727,7 +736,7 @@ Public Class FrmNutCheck
                 End If
                 LogPretty(logOut)
             Else
-                LogPretty("There were over 32 IP addresses omitted due to no contact.")
+                LogPretty("  - There were over 32 IP addresses omitted due to no contact.")
             End If
         End If
         If hitPorts.Count < tgtPorts.Count Then
@@ -736,7 +745,7 @@ Public Class FrmNutCheck
                 If Not hitPorts.Contains(testPort) Then ignoredPorts.Add(testPort)
             Next
             If ignoredPorts.Count <= 32 Then
-                LogPretty("The following ports were omitted due to no contact:")
+                LogPretty("  - The following ports were omitted due to no contact:")
                 Dim logOut As String = "  " & ignoredPorts.First.ToString
                 If ignoredPorts.Count > 1 Then
                     For intA As Integer = 1 To ignoredPorts.Count - 1
@@ -745,9 +754,18 @@ Public Class FrmNutCheck
                 End If
                 LogPretty(logOut)
             Else
-                LogPretty("There were over 32 ports omitted due to no contact.")
+                LogPretty("  - There were over 32 ports omitted due to no contact.")
             End If
         End If
+        LogPretty("")
+        LogPretty("  Scan Detailed Report:")
+        LogPretty("=================" & lotsOfEquals)
+        LogPretty("| IP  ADDRESESS |" & addPing & addHostname & portList)
+        LogPretty("=================" & lotsOfEquals)
+        For Each iHit As String In hitIPs
+            LogPretty(iHit)
+        Next
+        LogPretty("=================" & lotsOfEquals)
         LogPretty("")
         LogPretty("  End of log.")
     End Sub
