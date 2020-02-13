@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class frmNutCheck
+Partial Class FrmNutCheck
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -157,6 +157,8 @@ Partial Class frmNutCheck
         '
         'txtLog
         '
+        Me.txtLog.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.txtLog.Font = New System.Drawing.Font("Courier New", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtLog.Location = New System.Drawing.Point(12, 151)
         Me.txtLog.Multiline = True
@@ -205,6 +207,8 @@ Partial Class frmNutCheck
         '
         'txtResults
         '
+        Me.txtResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.txtResults.Font = New System.Drawing.Font("Courier New", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtResults.Location = New System.Drawing.Point(396, 151)
         Me.txtResults.Multiline = True
@@ -248,6 +252,9 @@ Partial Class frmNutCheck
         '
         'txtOrganizedResults
         '
+        Me.txtOrganizedResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtOrganizedResults.Font = New System.Drawing.Font("Courier New", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtOrganizedResults.Location = New System.Drawing.Point(731, 151)
         Me.txtOrganizedResults.Multiline = True
@@ -360,7 +367,7 @@ Partial Class frmNutCheck
         Me.chkHostname.Text = "Hostnames (WIP)"
         Me.chkHostname.UseVisualStyleBackColor = True
         '
-        'Nutcheck
+        'FrmNutCheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -395,9 +402,7 @@ Partial Class frmNutCheck
         Me.Controls.Add(Me.chkUdp)
         Me.Controls.Add(Me.chkHostname)
         Me.DoubleBuffered = True
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
-        Me.MaximizeBox = False
-        Me.Name = "Nutcheck"
+        Me.Name = "FrmNutCheck"
         Me.Text = "Darren's Nutcheck"
         Me.ResumeLayout(False)
         Me.PerformLayout()
