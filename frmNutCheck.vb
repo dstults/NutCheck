@@ -826,7 +826,7 @@ Public Class FrmNutCheck
 
     Private Function MachineReadableResults() As String
         Dim MachineReport As String = "TEST TIME," & TestTime & vbNewLine
-        MachineReport &= "INPUTS IPS," & txtAddresses.Text & vbNewLine
+        MachineReport &= "INPUT IPS," & txtAddresses.Text & vbNewLine
         MachineReport &= "INPUT PORTS," & txtPorts.Text & vbNewLine
         MachineReport &= "TIMEOUT," & txtTimeout.Text & vbNewLine
         MachineReport &= "TESTS,"
