@@ -53,6 +53,10 @@ Partial Class FrmNutCheck
         Me.chkVerboseMode = New System.Windows.Forms.CheckBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.chkHostname = New System.Windows.Forms.CheckBox()
+        Me.SaveFileDialogCSV = New System.Windows.Forms.SaveFileDialog()
+        Me.BtnSaveCSV = New System.Windows.Forms.Button()
+        Me.BtnSaveText = New System.Windows.Forms.Button()
+        Me.SaveFileDialogTXT = New System.Windows.Forms.SaveFileDialog()
         Me.SuspendLayout()
         '
         'btnTest
@@ -367,11 +371,43 @@ Partial Class FrmNutCheck
         Me.chkHostname.Text = "Hostnames (WIP)"
         Me.chkHostname.UseVisualStyleBackColor = True
         '
+        'SaveFileDialogCSV
+        '
+        Me.SaveFileDialogCSV.Filter = "CSV files|*.csv"
+        '
+        'BtnSaveCSV
+        '
+        Me.BtnSaveCSV.Enabled = False
+        Me.BtnSaveCSV.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BtnSaveCSV.Location = New System.Drawing.Point(709, 85)
+        Me.BtnSaveCSV.Name = "BtnSaveCSV"
+        Me.BtnSaveCSV.Size = New System.Drawing.Size(137, 37)
+        Me.BtnSaveCSV.TabIndex = 57
+        Me.BtnSaveCSV.Text = "SAVE CSV"
+        Me.BtnSaveCSV.UseVisualStyleBackColor = True
+        '
+        'BtnSaveText
+        '
+        Me.BtnSaveText.Enabled = False
+        Me.BtnSaveText.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BtnSaveText.Location = New System.Drawing.Point(852, 85)
+        Me.BtnSaveText.Name = "BtnSaveText"
+        Me.BtnSaveText.Size = New System.Drawing.Size(137, 37)
+        Me.BtnSaveText.TabIndex = 58
+        Me.BtnSaveText.Text = "SAVE TXT"
+        Me.BtnSaveText.UseVisualStyleBackColor = True
+        '
+        'SaveFileDialogTXT
+        '
+        Me.SaveFileDialogTXT.Filter = "Text files|*.txt"
+        '
         'FrmNutCheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1152, 591)
+        Me.Controls.Add(Me.BtnSaveText)
+        Me.Controls.Add(Me.BtnSaveCSV)
         Me.Controls.Add(Me.lblSpinner)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.chkVerboseMode)
@@ -439,4 +475,8 @@ Partial Class FrmNutCheck
     Friend WithEvents chkVerboseMode As CheckBox
     Friend WithEvents Label5 As Label
     Friend WithEvents chkHostname As CheckBox
+    Friend WithEvents SaveFileDialogCSV As SaveFileDialog
+    Friend WithEvents BtnSaveCSV As Button
+    Friend WithEvents BtnSaveText As Button
+    Friend WithEvents SaveFileDialogTXT As SaveFileDialog
 End Class

@@ -134,6 +134,7 @@ Public Class FrmNutCheck
         btnPreset3.Enabled = True
         btnPreset4.Enabled = True
         btnReset.Enabled = False
+        BtnSaveCSV.Enabled = False
 
         Timer1.Enabled = False
         lblSpinner.Text = "-"
@@ -163,6 +164,7 @@ Public Class FrmNutCheck
         btnPreset3.Enabled = False
         btnPreset4.Enabled = False
         btnReset.Enabled = False
+        BtnSaveCSV.Enabled = False
 
         Timer1.Enabled = True
         lblSpinner.Visible = True
@@ -184,6 +186,7 @@ Public Class FrmNutCheck
         btnPreset3.Enabled = False
         btnPreset4.Enabled = False
         btnReset.Enabled = True
+        BtnSaveCSV.Enabled = False
 
         Timer1.Enabled = False
         lblSpinner.Visible = True
@@ -746,4 +749,11 @@ Public Class FrmNutCheck
         End Select
     End Sub
 
+    Private Sub BtnSaveCSV_Click(sender As Object, e As EventArgs) Handles BtnSaveCSV.Click
+        SaveFileDialogCSV.ShowDialog()
+    End Sub
+
+    Private Sub BtnSaveText_Click(sender As Object, e As EventArgs) Handles BtnSaveText.Click
+        SaveFileDialogTXT.ShowDialog()
+    End Sub
 End Class
