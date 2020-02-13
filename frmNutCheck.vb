@@ -9,6 +9,8 @@ Public Class FrmNutCheck
 
     Public programNameWithVersion As String = "NutCheck v0.94"
     Public lastMajorRevisionDate As String = "2020/01/11"
+    Private ReadOnly MinWidth As Integer = 1050
+    Private ReadOnly MinHeight As Integer = 400
 
     Public Class ClsTcpJob
         Public parent As ClsNetJob
@@ -57,6 +59,8 @@ Public Class FrmNutCheck
 
     End Class
 
+    Public TestTime As String
+
     Public tgtPorts As New SortedSet(Of Integer)
     Public hitPorts As New SortedSet(Of Integer)
     Public currentBoredom As Integer = 0
@@ -72,8 +76,6 @@ Public Class FrmNutCheck
 #End Region
 
 #Region "Startup, Resets, Shared Functions"
-    Private ReadOnly MinWidth As Integer = 1050
-    Private ReadOnly MinHeight As Integer = 400
 
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
@@ -177,9 +179,10 @@ Public Class FrmNutCheck
         btnTest.Enabled = False
         Timer1.Enabled = True
 
-        txtLog.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
-        txtResults.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
-        txtOrganizedResults.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
+        TestTime = DateTime.Now.ToString
+        txtLog.Text = "Test started: " & TestTime & vbNewLine
+        txtResults.Text = "Test started: " & TestTime & vbNewLine
+        txtOrganizedResults.Text = "Test started: " & TestTime & vbNewLine
         currentBoredom = 0
 
     End Sub
@@ -793,16 +796,63 @@ Public Class FrmNutCheck
     End Sub
 
     Private Sub BtnSaveCSV_Click(sender As Object, e As EventArgs) Handles BtnSaveCSV.Click
-        SaveFileDialogCSV.ShowDialog()
-        IO.File.WriteAllText(SaveFileDialogTXT.FileName, MachineReadableResults)
+        Select Case SaveFileDialogCSV.ShowDialog()
+            Case DialogResult.Abort, DialogResult.Cancel
+                ' do nothing
+            Case Else
+                Try
+                    IO.File.WriteAllText(SaveFileDialogCSV.FileName, MachineReadableResults)
+                Catch ex As Exception
+                    MsgBox("Could not save file:" & vbNewLine & ex.Message)
+                End Try
+        End Select
     End Sub
 
     Private Sub BtnSaveText_Click(sender As Object, e As EventArgs) Handles BtnSaveText.Click
-        SaveFileDialogTXT.ShowDialog()
-        IO.File.WriteAllText(SaveFileDialogTXT.FileName, txtOrganizedResults.Text)
+        Select Case SaveFileDialogTXT.ShowDialog()
+            Case DialogResult.Abort, DialogResult.Cancel
+                ' do nothing
+            Case Else
+                IO.File.WriteAllText(SaveFileDialogTXT.FileName, txtOrganizedResults.Text)
+        End Select
     End Sub
 
     Private Function MachineReadableResults() As String
+        Dim MachineReport As String = "TEST TIME," & TestTime & vbNewLine
+        MachineReport &= "INPUTS IPS," & txtTgtAddresses.Text & vbNewLine
+        MachineReport &= "INPUT PORTS," & txtPorts.Text & vbNewLine
+        MachineReport &= "TIMEOUT," & txtTimeout.Text & vbNewLine
+        MachineReport &= "TESTS,"
+        If chkPing.Checked Then MachineReport &= "PING,"
+        If chkHostname.Checked Then MachineReport &= "HOSTNAME,"
+        If chkTcp.Checked Then MachineReport &= "TCP,"
+        If chkUdp.Checked Then MachineReport &= "UDP,"
+        MachineReport &= vbNewLine
+
+        For Each iJob As ClsNetJob In netJobs
+            MachineReport &= iJob.TgtIp.ToString
+            If iJob.PingSuccessful Then
+                MachineReport &= ",+ping"
+            ElseIf iJob.PingErrored Then
+                MachineReport &= ",!ping"
+            Else
+                MachineReport &= ",-ping"
+            End If
+            If iJob.TcpJobs.Count > 0 Then
+                MachineReport &= ",tcp"
+                For Each jTcpJob As ClsTcpJob In iJob.TcpJobs
+                    If jTcpJob.portOpen Then
+                        MachineReport &= ",+"
+                    Else
+                        MachineReport &= ",-"
+                    End If
+                    MachineReport &= jTcpJob.tgtPort
+                Next
+            End If
+            MachineReport &= vbNewLine
+        Next
+
+        Return MachineReport
 
     End Function
 
