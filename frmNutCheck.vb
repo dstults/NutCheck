@@ -83,7 +83,6 @@ Public Class FrmNutCheck
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
         txtAddresses.Text = myIpAddress & "/" & subnetMask
-        txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 1723, 3389, 5900"
         Form_Reset()
     End Sub
 
@@ -878,7 +877,4 @@ Public Class FrmNutCheck
         txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 500, 1723, 3389, 5900"
     End Sub
 
-    Private Sub txtAddresses_TextChanged(sender As Object, e As EventArgs) Handles txtAddresses.TextChanged
-
-    End Sub
 End Class
