@@ -24,7 +24,7 @@ Partial Class FrmNutCheck
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.btnTest = New System.Windows.Forms.Button()
-        Me.txtTgtAddresses = New System.Windows.Forms.TextBox()
+        Me.txtAddresses = New System.Windows.Forms.TextBox()
         Me.txtPorts = New System.Windows.Forms.TextBox()
         Me.lblPort = New System.Windows.Forms.Label()
         Me.lblIP = New System.Windows.Forms.Label()
@@ -69,13 +69,13 @@ Partial Class FrmNutCheck
         Me.btnTest.Text = "R U N   T E S T"
         Me.btnTest.UseVisualStyleBackColor = True
         '
-        'txtTgtAddresses
+        'txtAddresses
         '
-        Me.txtTgtAddresses.Location = New System.Drawing.Point(153, 34)
-        Me.txtTgtAddresses.Name = "txtTgtAddresses"
-        Me.txtTgtAddresses.Size = New System.Drawing.Size(351, 20)
-        Me.txtTgtAddresses.TabIndex = 1
-        Me.txtTgtAddresses.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.txtAddresses.Location = New System.Drawing.Point(153, 34)
+        Me.txtAddresses.Name = "txtAddresses"
+        Me.txtAddresses.Size = New System.Drawing.Size(351, 20)
+        Me.txtAddresses.TabIndex = 1
+        Me.txtAddresses.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'txtPorts
         '
@@ -83,7 +83,7 @@ Partial Class FrmNutCheck
         Me.txtPorts.Name = "txtPorts"
         Me.txtPorts.Size = New System.Drawing.Size(336, 20)
         Me.txtPorts.TabIndex = 19
-        Me.txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 1723, 3389, 5900"
+        Me.txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 500, 1723, 3389, 5900"
         Me.txtPorts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'lblPort
@@ -235,13 +235,12 @@ Partial Class FrmNutCheck
         'btnPreset1
         '
         Me.btnPreset1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset1.Location = New System.Drawing.Point(920, 20)
+        Me.btnPreset1.Location = New System.Drawing.Point(852, 17)
         Me.btnPreset1.Name = "btnPreset1"
-        Me.btnPreset1.Size = New System.Drawing.Size(109, 28)
+        Me.btnPreset1.Size = New System.Drawing.Size(40, 28)
         Me.btnPreset1.TabIndex = 42
-        Me.btnPreset1.Text = "Preset Test 1"
+        Me.btnPreset1.Text = "1"
         Me.btnPreset1.UseVisualStyleBackColor = True
-        Me.btnPreset1.Visible = False
         '
         'btnReset
         '
@@ -265,27 +264,26 @@ Partial Class FrmNutCheck
         Me.txtOrganizedResults.Name = "txtOrganizedResults"
         Me.txtOrganizedResults.ReadOnly = True
         Me.txtOrganizedResults.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtOrganizedResults.Size = New System.Drawing.Size(413, 433)
+        Me.txtOrganizedResults.Size = New System.Drawing.Size(409, 433)
         Me.txtOrganizedResults.TabIndex = 44
         Me.txtOrganizedResults.WordWrap = False
         '
         'btnPreset2
         '
         Me.btnPreset2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset2.Location = New System.Drawing.Point(1035, 20)
+        Me.btnPreset2.Location = New System.Drawing.Point(898, 17)
         Me.btnPreset2.Name = "btnPreset2"
-        Me.btnPreset2.Size = New System.Drawing.Size(109, 28)
+        Me.btnPreset2.Size = New System.Drawing.Size(40, 28)
         Me.btnPreset2.TabIndex = 45
-        Me.btnPreset2.Text = "Preset Test 2"
+        Me.btnPreset2.Text = "2"
         Me.btnPreset2.UseVisualStyleBackColor = True
-        Me.btnPreset2.Visible = False
         '
         'btnPreset3
         '
         Me.btnPreset3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset3.Location = New System.Drawing.Point(920, 51)
+        Me.btnPreset3.Location = New System.Drawing.Point(852, 45)
         Me.btnPreset3.Name = "btnPreset3"
-        Me.btnPreset3.Size = New System.Drawing.Size(109, 28)
+        Me.btnPreset3.Size = New System.Drawing.Size(40, 28)
         Me.btnPreset3.TabIndex = 46
         Me.btnPreset3.Text = "Preset Test 3"
         Me.btnPreset3.UseVisualStyleBackColor = True
@@ -294,9 +292,9 @@ Partial Class FrmNutCheck
         'btnPreset4
         '
         Me.btnPreset4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset4.Location = New System.Drawing.Point(1035, 51)
+        Me.btnPreset4.Location = New System.Drawing.Point(898, 45)
         Me.btnPreset4.Name = "btnPreset4"
-        Me.btnPreset4.Size = New System.Drawing.Size(109, 28)
+        Me.btnPreset4.Size = New System.Drawing.Size(40, 28)
         Me.btnPreset4.TabIndex = 47
         Me.btnPreset4.Text = "Preset Test 4"
         Me.btnPreset4.UseVisualStyleBackColor = True
@@ -405,7 +403,7 @@ Partial Class FrmNutCheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1152, 591)
+        Me.ClientSize = New System.Drawing.Size(1148, 591)
         Me.Controls.Add(Me.BtnSaveText)
         Me.Controls.Add(Me.BtnSaveCSV)
         Me.Controls.Add(Me.lblSpinner)
@@ -431,7 +429,7 @@ Partial Class FrmNutCheck
         Me.Controls.Add(Me.lblPort)
         Me.Controls.Add(Me.lblIP)
         Me.Controls.Add(Me.txtPorts)
-        Me.Controls.Add(Me.txtTgtAddresses)
+        Me.Controls.Add(Me.txtAddresses)
         Me.Controls.Add(Me.btnTest)
         Me.Controls.Add(Me.chkPing)
         Me.Controls.Add(Me.chkTcp)
@@ -446,7 +444,7 @@ Partial Class FrmNutCheck
     End Sub
 
     Friend WithEvents btnTest As Button
-    Friend WithEvents txtTgtAddresses As TextBox
+    Friend WithEvents txtAddresses As TextBox
     Friend WithEvents txtPorts As TextBox
     Friend WithEvents lblPort As Label
     Friend WithEvents lblIP As Label

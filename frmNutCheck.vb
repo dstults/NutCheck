@@ -79,7 +79,7 @@ Public Class FrmNutCheck
 
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
-        txtTgtAddresses.Text = myIpAddress & "/" & subnetMask
+        txtAddresses.Text = myIpAddress & "/" & subnetMask
         txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 1723, 3389, 5900"
         Form_Reset()
     End Sub
@@ -133,6 +133,8 @@ Public Class FrmNutCheck
     Private Sub Form_Reset()
         ' RESET GUI TO STARTUP STATE
         Me.Text = "Darren's " & programNameWithVersion & " - IDLE"
+        txtAddresses.Enabled = True
+        txtPorts.Enabled = True
         btnTest.Enabled = True
         btnPreset1.Enabled = True
         btnPreset2.Enabled = True
@@ -164,6 +166,8 @@ Public Class FrmNutCheck
 
     Private Sub Form_Work_Begin()
         Me.Text = "Darren's " & programNameWithVersion & " - WORKING"
+        txtAddresses.Enabled = False
+        txtPorts.Enabled = False
         btnTest.Enabled = False
         btnPreset1.Enabled = False
         btnPreset2.Enabled = False
@@ -189,6 +193,8 @@ Public Class FrmNutCheck
 
     Private Sub Form_Work_End()
         Me.Text = "Darren's " & programNameWithVersion & " - FINISHED"
+        txtAddresses.Enabled = False
+        txtPorts.Enabled = False
         btnTest.Enabled = False
         btnPreset1.Enabled = False
         btnPreset2.Enabled = False
@@ -295,7 +301,7 @@ Public Class FrmNutCheck
         ' then attempt to parse as IP
         ' then dns lookup if failed
 
-        Dim checkForCommas() As String = Split(txtTgtAddresses.Text, ",")
+        Dim checkForCommas() As String = Split(txtAddresses.Text, ",")
         ' DNS querie will fail unless you trim excess spaces
         For intA As Integer = 0 To checkForCommas.Length - 1
             checkForCommas(intA) = Trim(checkForCommas(intA))
@@ -715,7 +721,7 @@ Public Class FrmNutCheck
         Next
 
         LogPretty("  Scan Input -")
-        LogPretty("  - IP Scan Input: " & txtTgtAddresses.Text)
+        LogPretty("  - IP Scan Input: " & txtAddresses.Text)
         LogPretty("  - Port Scan Input: " & txtPorts.Text)
         LogPretty("  - Timeout: " & txtTimeout.Text)
         Dim testList As String = ""
@@ -819,7 +825,7 @@ Public Class FrmNutCheck
 
     Private Function MachineReadableResults() As String
         Dim MachineReport As String = "TEST TIME," & TestTime & vbNewLine
-        MachineReport &= "INPUTS IPS," & txtTgtAddresses.Text & vbNewLine
+        MachineReport &= "INPUTS IPS," & txtAddresses.Text & vbNewLine
         MachineReport &= "INPUT PORTS," & txtPorts.Text & vbNewLine
         MachineReport &= "TIMEOUT," & txtTimeout.Text & vbNewLine
         MachineReport &= "TESTS,"
@@ -859,5 +865,17 @@ Public Class FrmNutCheck
     Private Sub FrmNutCheck_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
         If Me.Width < MinWidth Then Me.Width = MinWidth
         If Me.Height < MinHeight Then Me.Height = MinHeight
+    End Sub
+
+    Private Sub btnPreset1_Click(sender As Object, e As EventArgs) Handles btnPreset1.Click
+        txtPorts.Text = "20-22, 80, 139, 443, 445, 3389, 5900"
+    End Sub
+
+    Private Sub btnPreset2_Click(sender As Object, e As EventArgs) Handles btnPreset2.Click
+        txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 500, 1723, 3389, 5900"
+    End Sub
+
+    Private Sub txtAddresses_TextChanged(sender As Object, e As EventArgs) Handles txtAddresses.TextChanged
+
     End Sub
 End Class
