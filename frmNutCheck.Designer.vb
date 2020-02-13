@@ -23,6 +23,7 @@ Partial Class FrmNutCheck
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmNutCheck))
         Me.btnTest = New System.Windows.Forms.Button()
         Me.txtAddresses = New System.Windows.Forms.TextBox()
         Me.txtPorts = New System.Windows.Forms.TextBox()
@@ -436,6 +437,7 @@ Partial Class FrmNutCheck
         Me.Controls.Add(Me.chkUdp)
         Me.Controls.Add(Me.chkHostname)
         Me.DoubleBuffered = True
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "FrmNutCheck"
         Me.Text = "Darren's Nutcheck"
         Me.ResumeLayout(False)

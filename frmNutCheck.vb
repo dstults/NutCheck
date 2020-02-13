@@ -2,12 +2,15 @@
 ' Love thy DranKof
 
 'Imports System.Net.NetworkInformation
+' Acorn Icon: https://www.iconfinder.com/icons/92461/acorn_icon
+' Free Use License: https://creativecommons.org/licenses/by/3.0/us/
+
 
 Public Class FrmNutCheck
 
 #Region "Declarations"
 
-    Public programNameWithVersion As String = "NutCheck v0.94"
+    Public programNameWithVersion As String = "NutCheck v0.98"
     Public lastMajorRevisionDate As String = "2020/01/11"
     Private ReadOnly MinWidth As Integer = 1050
     Private ReadOnly MinHeight As Integer = 400
