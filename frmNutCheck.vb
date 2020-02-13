@@ -73,7 +73,7 @@ Public Class FrmNutCheck
 
 #Region "Startup, Resets, Shared Functions"
     Private ReadOnly MinWidth As Integer = 1050
-    Private ReadOnly MinHeight As Integer = 300
+    Private ReadOnly MinHeight As Integer = 400
 
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
@@ -180,6 +180,15 @@ Public Class FrmNutCheck
         txtLog.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
         txtResults.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
         txtOrganizedResults.Text = "Test started: " & DateTime.Now.ToString & vbNewLine
+        txtOrganizedResults.Text &= "IP Scan Input: " & txtTgtAddresses.Text & vbNewLine
+        txtOrganizedResults.Text &= "Port Scan Input: " & txtPorts.Text & vbNewLine
+        txtOrganizedResults.Text &= "Timeout: " & txtTimeout.Text & vbNewLine
+        Dim testList As String = ""
+        If chkPing.Checked Then testList &= " PING"
+        If chkHostname.Checked Then testList &= " HOSTNAME"
+        If chkTcp.Checked Then testList &= " TCP"
+        If chkUdp.Checked Then testList &= " UDP"
+        txtOrganizedResults.Text &= "Tests Conducted:" & testList & vbNewLine & vbNewLine
         currentBoredom = 0
 
     End Sub
@@ -650,6 +659,7 @@ Public Class FrmNutCheck
             Next
         End If
         LogPretty("  Organized scan summary:")
+        LogPretty("")
         LogPretty("=================" & lotsOfEquals)
         LogPretty("| IP  ADDRESESS |" & addPing & addHostname & portList)
         LogPretty("=================" & lotsOfEquals)
@@ -707,28 +717,36 @@ Public Class FrmNutCheck
         Next
         LogPretty("=================" & lotsOfEquals)
         If ignoredIps.Count > 0 Then
-            LogPretty("The following IPs were omitted due to no contact:")
-            Dim logOut As String = "  " & ignoredIps.First
-            If ignoredIps.Count > 1 Then
-                For intA As Integer = 1 To ignoredIps.Count - 1
-                    logOut &= ", " & ignoredIps(intA)
-                Next
+            If ignoredIps.Count <= 32 Then
+                LogPretty("The following IPs were omitted due to no contact:")
+                Dim logOut As String = "  " & ignoredIps.First
+                If ignoredIps.Count > 1 Then
+                    For intA As Integer = 1 To ignoredIps.Count - 1
+                        logOut &= ", " & ignoredIps(intA)
+                    Next
+                End If
+                LogPretty(logOut)
+            Else
+                LogPretty("There were over 32 IP addresses omitted due to no contact.")
             End If
-            LogPretty(logOut)
         End If
         If hitPorts.Count < tgtPorts.Count Then
             Dim ignoredPorts As New HashSet(Of Integer)
             For Each testPort As Integer In tgtPorts
                 If Not hitPorts.Contains(testPort) Then ignoredPorts.Add(testPort)
             Next
-            LogPretty("The following ports were omitted due to no contact:")
-            Dim logOut As String = "  " & ignoredPorts.First.ToString
-            If ignoredPorts.Count > 1 Then
-                For intA As Integer = 1 To ignoredPorts.Count - 1
-                    logOut &= ", " & ignoredPorts(intA).ToString
-                Next
+            If ignoredPorts.Count <= 32 Then
+                LogPretty("The following ports were omitted due to no contact:")
+                Dim logOut As String = "  " & ignoredPorts.First.ToString
+                If ignoredPorts.Count > 1 Then
+                    For intA As Integer = 1 To ignoredPorts.Count - 1
+                        logOut &= ", " & ignoredPorts(intA).ToString
+                    Next
+                End If
+                LogPretty(logOut)
+            Else
+                LogPretty("There were over 32 ports omitted due to no contact.")
             End If
-            LogPretty(logOut)
         End If
         LogPretty("")
         LogPretty("  End of log.")
