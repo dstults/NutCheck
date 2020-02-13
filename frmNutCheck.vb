@@ -72,6 +72,9 @@ Public Class FrmNutCheck
 #End Region
 
 #Region "Startup, Resets, Shared Functions"
+    Private ReadOnly MinWidth As Integer = 1050
+    Private ReadOnly MinHeight As Integer = 300
+
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
         txtTgtAddresses.Text = myIpAddress & "/" & subnetMask
@@ -135,6 +138,7 @@ Public Class FrmNutCheck
         btnPreset4.Enabled = True
         btnReset.Enabled = False
         BtnSaveCSV.Enabled = False
+        BtnSaveText.Enabled = False
 
         Timer1.Enabled = False
         lblSpinner.Text = "-"
@@ -165,6 +169,8 @@ Public Class FrmNutCheck
         btnPreset4.Enabled = False
         btnReset.Enabled = False
         BtnSaveCSV.Enabled = False
+        BtnSaveCSV.Enabled = False
+        BtnSaveText.Enabled = False
 
         Timer1.Enabled = True
         lblSpinner.Visible = True
@@ -186,7 +192,8 @@ Public Class FrmNutCheck
         btnPreset3.Enabled = False
         btnPreset4.Enabled = False
         btnReset.Enabled = True
-        BtnSaveCSV.Enabled = False
+        BtnSaveCSV.Enabled = True
+        BtnSaveText.Enabled = True
 
         Timer1.Enabled = False
         lblSpinner.Visible = True
@@ -751,9 +758,20 @@ Public Class FrmNutCheck
 
     Private Sub BtnSaveCSV_Click(sender As Object, e As EventArgs) Handles BtnSaveCSV.Click
         SaveFileDialogCSV.ShowDialog()
+        IO.File.WriteAllText(SaveFileDialogTXT.FileName, MachineReadableResults)
     End Sub
 
     Private Sub BtnSaveText_Click(sender As Object, e As EventArgs) Handles BtnSaveText.Click
         SaveFileDialogTXT.ShowDialog()
+        IO.File.WriteAllText(SaveFileDialogTXT.FileName, txtOrganizedResults.Text)
+    End Sub
+
+    Private Function MachineReadableResults() As String
+
+    End Function
+
+    Private Sub FrmNutCheck_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
+        If Me.Width < MinWidth Then Me.Width = MinWidth
+        If Me.Height < MinHeight Then Me.Height = MinHeight
     End Sub
 End Class
