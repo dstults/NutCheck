@@ -1,11 +1,4 @@
-﻿' Darren Stults
-' Love thy DranKof
-
-'Imports System.Net.NetworkInformation
-' Acorn Icon: https://www.iconfinder.com/icons/92461/acorn_icon
-' Free Use License: https://creativecommons.org/licenses/by/3.0/us/
-
-Public Class FrmNutCheck
+﻿Public Class FrmNutCheck
 
 #Region "Declarations"
 
@@ -81,6 +74,7 @@ Public Class FrmNutCheck
 
     Private Sub Nutcheck_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         GetComputerStats()
+        btnPreset2_Click(sender, e)
         txtAddresses.Text = myIpAddress & "/" & subnetMask
         Form_Reset()
     End Sub
@@ -144,6 +138,7 @@ Public Class FrmNutCheck
         btnReset.Enabled = False
         BtnSaveCSV.Enabled = False
         BtnSaveText.Enabled = False
+        BtnTimer.Enabled = True
 
         Timer1.Enabled = False
         lblSpinner.Text = "-"
@@ -178,6 +173,7 @@ Public Class FrmNutCheck
         BtnSaveCSV.Enabled = False
         BtnSaveCSV.Enabled = False
         BtnSaveText.Enabled = False
+        BtnTimer.Enabled = False
 
         Timer1.Enabled = True
         lblSpinner.Visible = True
@@ -204,6 +200,7 @@ Public Class FrmNutCheck
         btnReset.Enabled = True
         BtnSaveCSV.Enabled = True
         BtnSaveText.Enabled = True
+        BtnTimer.Enabled = False
 
         Timer1.Enabled = False
         lblSpinner.Visible = True
@@ -213,6 +210,35 @@ Public Class FrmNutCheck
         LogVerbose("Work complete!")
         LogResult(vbNewLine & "No more active tests remaining.")
         DoFullPrettyLog()
+
+    End Sub
+
+    Private Sub Form_TimerMode()
+        Me.Text = "Darren's " & programNameWithVersion & " - WORKING"
+        txtAddresses.Enabled = False
+        txtPorts.Enabled = False
+        btnTest.Enabled = False
+        btnPreset1.Enabled = False
+        btnPreset2.Enabled = False
+        btnPreset3.Enabled = False
+        btnPreset4.Enabled = False
+        btnReset.Enabled = False
+        BtnSaveCSV.Enabled = False
+        BtnSaveCSV.Enabled = False
+        BtnSaveText.Enabled = False
+        BtnTimer.Enabled = False
+        BtnTimer.Text = "NEXT:"
+
+        Timer1.Enabled = False
+        lblSpinner.Visible = False
+        btnTest.Enabled = False
+        Timer1.Enabled = False
+
+        TestTime = DateTime.Now.ToString
+        txtLog.Text = "Test started: " & TestTime & vbNewLine
+        txtResults.Text = "Test started: " & TestTime & vbNewLine
+        txtOrganizedResults.Text = "Test started: " & TestTime & vbNewLine
+        currentBoredom = 0
 
     End Sub
 
@@ -870,10 +896,41 @@ Public Class FrmNutCheck
 
     Private Sub btnPreset1_Click(sender As Object, e As EventArgs) Handles btnPreset1.Click
         txtPorts.Text = "20-22, 80, 139, 443, 445, 3389, 5900"
+        txtTimeout.Text = "3000"
     End Sub
 
     Private Sub btnPreset2_Click(sender As Object, e As EventArgs) Handles btnPreset2.Click
         txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 500, 1723, 3389, 5900"
+        txtTimeout.Text = "10000"
     End Sub
 
+    Private Sub btnPreset3_Click(sender As Object, e As EventArgs) Handles btnPreset3.Click
+        txtPorts.Text = "7, 13, 17, 20-23, 25, 53, 80, 135, 139, 443, 445, 500, 1723, 3389, 5900"
+        txtTimeout.Text = "20000"
+    End Sub
+
+    Private Sub btnPreset4_Click(sender As Object, e As EventArgs) Handles btnPreset4.Click
+        ' Most commonly hacked ports:
+        ' https://www.dummies.com/programming/networking/commonly-hacked-ports/
+        ' TCP port 21 — FTP (File Transfer Protocol)
+        ' TCP port 22 — SSH (Secure Shell)
+        ' TCP port 23 — Telnet
+        ' TCP port 25 — SMTP (Simple Mail Transfer Protocol)
+        ' TCP and UDP port 53 — DNS (Domain Name System)
+        ' TCP port 443 — HTTP (Hypertext Transport Protocol) and HTTPS (HTTP over SSL)
+        ' TCP port 110 — POP3 (Post Office Protocol version 3)
+        ' TCP and UDP port 135 — Windows RPC
+        ' TCP and UDP ports 137–139 — Windows NetBIOS over TCP/IP
+        ' TCP port 1433 and UDP port 1434 — Microsoft SQL Server
+        txtPorts.Text = "7, 13, 17, 20-23, 25, 53, 80, 110, 135, 137-139, 443, 445, 500, 1433-4, 1723, 3389, 5800, 5801, 5900, 5901"
+        txtTimeout.Text = "40000"
+    End Sub
+
+    Private Sub FrmNutCheck_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        Application.Exit()
+    End Sub
+
+    Private Sub BtnTimer_Click(sender As Object, e As EventArgs) Handles BtnTimer.Click
+        RunTimed
+    End Sub
 End Class

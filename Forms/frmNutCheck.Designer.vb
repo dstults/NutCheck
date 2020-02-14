@@ -58,6 +58,8 @@ Partial Class FrmNutCheck
         Me.BtnSaveCSV = New System.Windows.Forms.Button()
         Me.BtnSaveText = New System.Windows.Forms.Button()
         Me.SaveFileDialogTXT = New System.Windows.Forms.SaveFileDialog()
+        Me.txtCountdown = New System.Windows.Forms.Label()
+        Me.BtnTimer = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'btnTest
@@ -238,7 +240,7 @@ Partial Class FrmNutCheck
         Me.btnPreset1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnPreset1.Location = New System.Drawing.Point(852, 17)
         Me.btnPreset1.Name = "btnPreset1"
-        Me.btnPreset1.Size = New System.Drawing.Size(40, 28)
+        Me.btnPreset1.Size = New System.Drawing.Size(29, 28)
         Me.btnPreset1.TabIndex = 42
         Me.btnPreset1.Text = "1"
         Me.btnPreset1.UseVisualStyleBackColor = True
@@ -272,9 +274,9 @@ Partial Class FrmNutCheck
         'btnPreset2
         '
         Me.btnPreset2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset2.Location = New System.Drawing.Point(898, 17)
+        Me.btnPreset2.Location = New System.Drawing.Point(882, 17)
         Me.btnPreset2.Name = "btnPreset2"
-        Me.btnPreset2.Size = New System.Drawing.Size(40, 28)
+        Me.btnPreset2.Size = New System.Drawing.Size(29, 28)
         Me.btnPreset2.TabIndex = 45
         Me.btnPreset2.Text = "2"
         Me.btnPreset2.UseVisualStyleBackColor = True
@@ -284,22 +286,20 @@ Partial Class FrmNutCheck
         Me.btnPreset3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnPreset3.Location = New System.Drawing.Point(852, 45)
         Me.btnPreset3.Name = "btnPreset3"
-        Me.btnPreset3.Size = New System.Drawing.Size(40, 28)
+        Me.btnPreset3.Size = New System.Drawing.Size(29, 28)
         Me.btnPreset3.TabIndex = 46
-        Me.btnPreset3.Text = "Preset Test 3"
+        Me.btnPreset3.Text = "3"
         Me.btnPreset3.UseVisualStyleBackColor = True
-        Me.btnPreset3.Visible = False
         '
         'btnPreset4
         '
         Me.btnPreset4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreset4.Location = New System.Drawing.Point(898, 45)
+        Me.btnPreset4.Location = New System.Drawing.Point(882, 45)
         Me.btnPreset4.Name = "btnPreset4"
-        Me.btnPreset4.Size = New System.Drawing.Size(40, 28)
+        Me.btnPreset4.Size = New System.Drawing.Size(29, 28)
         Me.btnPreset4.TabIndex = 47
-        Me.btnPreset4.Text = "Preset Test 4"
+        Me.btnPreset4.Text = "4"
         Me.btnPreset4.UseVisualStyleBackColor = True
-        Me.btnPreset4.Visible = False
         '
         'Label1
         '
@@ -400,11 +400,36 @@ Partial Class FrmNutCheck
         '
         Me.SaveFileDialogTXT.Filter = "Text files|*.txt"
         '
+        'txtCountdown
+        '
+        Me.txtCountdown.BackColor = System.Drawing.Color.Black
+        Me.txtCountdown.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtCountdown.Font = New System.Drawing.Font("Courier New", 14.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txtCountdown.Location = New System.Drawing.Point(951, 45)
+        Me.txtCountdown.Name = "txtCountdown"
+        Me.txtCountdown.Size = New System.Drawing.Size(75, 28)
+        Me.txtCountdown.TabIndex = 59
+        Me.txtCountdown.Text = "-"
+        Me.txtCountdown.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.txtCountdown.Visible = False
+        '
+        'BtnTimer
+        '
+        Me.BtnTimer.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BtnTimer.Location = New System.Drawing.Point(951, 17)
+        Me.BtnTimer.Name = "BtnTimer"
+        Me.BtnTimer.Size = New System.Drawing.Size(75, 28)
+        Me.BtnTimer.TabIndex = 60
+        Me.BtnTimer.Text = "TIMER"
+        Me.BtnTimer.UseVisualStyleBackColor = True
+        '
         'FrmNutCheck
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1148, 591)
+        Me.Controls.Add(Me.BtnTimer)
+        Me.Controls.Add(Me.txtCountdown)
         Me.Controls.Add(Me.BtnSaveText)
         Me.Controls.Add(Me.BtnSaveCSV)
         Me.Controls.Add(Me.lblSpinner)
@@ -479,4 +504,6 @@ Partial Class FrmNutCheck
     Friend WithEvents BtnSaveCSV As Button
     Friend WithEvents BtnSaveText As Button
     Friend WithEvents SaveFileDialogTXT As SaveFileDialog
+    Friend WithEvents txtCountdown As Label
+    Friend WithEvents BtnTimer As Button
 End Class

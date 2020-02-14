@@ -6,11 +6,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{734ED5D9-092D-4AF9-B159-9D666A08CEED}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>NutCheck.My.MyApplication</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>NutCheck</RootNamespace>
     <AssemblyName>NutCheck</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>WindowsForms</MyType>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -48,7 +48,7 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\acorn.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Acorn.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -76,11 +76,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="frmNutCheck.vb">
+    <Compile Include="Core\ModCore.vb" />
+    <Compile Include="Forms\FrmNutCheck.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmNutCheck.Designer.vb">
-      <DependentUpon>frmNutCheck.vb</DependentUpon>
+    <Compile Include="Forms\FrmNutCheck.Designer.vb">
+      <DependentUpon>FrmNutCheck.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -100,8 +101,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="frmNutCheck.resx">
-      <DependentUpon>frmNutCheck.vb</DependentUpon>
+    <EmbeddedResource Include="Forms\FrmNutCheck.resx">
+      <DependentUpon>FrmNutCheck.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -123,7 +124,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\acorn.ico" />
+    <EmbeddedResource Include="Resources\Acorn.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
