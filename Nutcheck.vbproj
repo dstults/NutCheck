@@ -76,6 +76,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ClsNetJobs.vb" />
     <Compile Include="Core\ModCore.vb" />
     <Compile Include="Forms\FrmNutCheck.vb">
       <SubType>Form</SubType>
@@ -99,6 +100,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="NetProcesses\ModGetComputerStats.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\FrmNutCheck.resx">

@@ -2,71 +2,8 @@
 
 #Region "Declarations"
 
-    Public programNameWithVersion As String = "NutCheck v0.98"
-    Public lastMajorRevisionDate As String = "2020/01/11"
     Private ReadOnly MinWidth As Integer = 1050
     Private ReadOnly MinHeight As Integer = 400
-
-    Public Class ClsTcpJob
-        Public parent As ClsNetJob
-        Public tgtPort As Integer
-        Public tcpClient As New Net.Sockets.TcpClient
-        Public portOpen As Boolean
-        Public replyTime As Integer
-        Public Sub New(setParent As ClsNetJob, setPort As Integer)
-            parent = setParent
-            parent.TcpJobs.Add(Me)
-            tgtPort = setPort
-        End Sub
-
-    End Class
-    Public Class ClsUdpJob
-        Public parent As ClsNetJob
-        Public tgtPort As Integer
-        Public udpClient As New Net.Sockets.UdpClient
-        Public portReplied As Boolean
-        Public replyTime As Integer
-        Public Sub New(setParent As ClsNetJob, setPort As Integer)
-            parent = setParent
-            parent.UdpJobs.Add(Me)
-            tgtPort = setPort
-        End Sub
-
-    End Class
-
-    Public Class ClsNetJob
-
-        Public TgtIp As Net.IPAddress
-
-        Public PingTest As New Net.NetworkInformation.Ping
-        Public PingErrored As Boolean
-        Public PingSuccessful As Boolean
-        Public PingRoundtripTime As Long
-
-        Public Hostname As String = ""
-
-        Public TcpJobs As New List(Of ClsTcpJob)
-        Public UdpJobs As New List(Of ClsUdpJob)
-
-        Public Sub New(setIp As Net.IPAddress)
-            TgtIp = setIp
-        End Sub
-
-    End Class
-
-    Public TestTime As String
-
-    Public tgtPorts As New SortedSet(Of Integer)
-    Public hitPorts As New SortedSet(Of Integer)
-    Public currentBoredom As Integer = 0
-    Public myTimeout As Integer = 2000 ' ms until I abort
-    Public thisScanDnsServer As String = ""
-
-    Public netJobs As New List(Of ClsNetJob)
-    Public pingJobs As New List(Of ClsNetJob)
-    Public hostnameJobs As New List(Of ClsNetJob)
-    Public tcpJobs As New List(Of ClsTcpJob)
-    Public udpJobs As New List(Of ClsUdpJob)
 
 #End Region
 
@@ -77,52 +14,6 @@
         btnPreset2_Click(sender, e)
         txtAddresses.Text = myIpAddress & "/" & subnetMask
         Form_Reset()
-    End Sub
-
-    Public myComputerName As String
-    Public myIpAddress As String
-    Public subnetMask As String
-    Public myGateway As String
-    Public dns1 As String
-    Public dns2 As String
-    Private Sub GetComputerStats()
-        ' Courtesy of: https://stackoverflow.com/questions/40814462/get-ip-address-subnet-default-gateway-dns1-and-dns2-with-vb-net
-
-        'Computer Name
-        myComputerName = System.Net.Dns.GetHostName()
-        For Each ip In System.Net.Dns.GetHostEntry(myComputerName).AddressList
-            If ip.AddressFamily = Net.Sockets.AddressFamily.InterNetwork Then
-                'IPv4 Adress
-                myIpAddress = ip.ToString()
-
-                For Each adapter As Net.NetworkInformation.NetworkInterface In Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
-                    For Each unicastIPAddressInformation As Net.NetworkInformation.UnicastIPAddressInformation In adapter.GetIPProperties().UnicastAddresses
-                        If unicastIPAddressInformation.Address.AddressFamily = Net.Sockets.AddressFamily.InterNetwork Then
-                            If ip.Equals(unicastIPAddressInformation.Address) Then
-                                'Subnet Mask
-                                subnetMask = unicastIPAddressInformation.IPv4Mask.ToString
-
-                                Dim adapterProperties As Net.NetworkInformation.IPInterfaceProperties = adapter.GetIPProperties()
-                                For Each gateway As Net.NetworkInformation.GatewayIPAddressInformation In adapterProperties.GatewayAddresses
-                                    'Default Gateway
-                                    myGateway = gateway.Address.ToString()
-                                Next
-
-                                'DNS1
-                                If adapterProperties.DnsAddresses.Count > 0 Then
-                                    dns1 = adapterProperties.DnsAddresses(0).ToString()
-                                End If
-
-                                'DNS2
-                                If adapterProperties.DnsAddresses.Count > 1 Then
-                                    dns2 = adapterProperties.DnsAddresses(1).ToString()
-                                End If
-                            End If
-                        End If
-                    Next
-                Next
-            End If
-        Next
     End Sub
 
     Private Sub Form_Reset()
@@ -896,17 +787,17 @@
 
     Private Sub btnPreset1_Click(sender As Object, e As EventArgs) Handles btnPreset1.Click
         txtPorts.Text = "20-22, 80, 139, 443, 445, 3389, 5900"
-        txtTimeout.Text = "3000"
+        txtTimeout.Text = "1000"
     End Sub
 
     Private Sub btnPreset2_Click(sender As Object, e As EventArgs) Handles btnPreset2.Click
         txtPorts.Text = "7, 13, 17, 20-22, 53, 80, 139, 443, 445, 500, 1723, 3389, 5900"
-        txtTimeout.Text = "10000"
+        txtTimeout.Text = "2000"
     End Sub
 
     Private Sub btnPreset3_Click(sender As Object, e As EventArgs) Handles btnPreset3.Click
         txtPorts.Text = "7, 13, 17, 20-23, 25, 53, 80, 135, 139, 443, 445, 500, 1723, 3389, 5900"
-        txtTimeout.Text = "20000"
+        txtTimeout.Text = "3500"
     End Sub
 
     Private Sub btnPreset4_Click(sender As Object, e As EventArgs) Handles btnPreset4.Click
@@ -923,7 +814,7 @@
         ' TCP and UDP ports 137–139 — Windows NetBIOS over TCP/IP
         ' TCP port 1433 and UDP port 1434 — Microsoft SQL Server
         txtPorts.Text = "7, 13, 17, 20-23, 25, 53, 80, 110, 135, 137-139, 443, 445, 500, 1433-4, 1723, 3389, 5800, 5801, 5900, 5901"
-        txtTimeout.Text = "40000"
+        txtTimeout.Text = "5000"
     End Sub
 
     Private Sub FrmNutCheck_Closed(sender As Object, e As EventArgs) Handles Me.Closed
