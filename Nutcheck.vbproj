@@ -78,6 +78,13 @@
   <ItemGroup>
     <Compile Include="Core\ClsNetJobs.vb" />
     <Compile Include="Core\ModCore.vb" />
+    <Compile Include="FileIO\ModFileIO.vb" />
+    <Compile Include="Forms\FormProgress.Designer.vb">
+      <DependentUpon>FormProgress.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormProgress.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FrmNutCheck.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -103,6 +110,9 @@
     <Compile Include="NetProcesses\ModGetComputerStats.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\FormProgress.resx">
+      <DependentUpon>FormProgress.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmNutCheck.resx">
       <DependentUpon>FrmNutCheck.vb</DependentUpon>
     </EmbeddedResource>

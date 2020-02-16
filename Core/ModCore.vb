@@ -9,6 +9,7 @@
     Public lastMajorRevisionDate As String = "2020/02/14"
 
     Public MainForm As FrmNutCheck
+    Public ProgressForm As FormProgress
 
     Public tgtPorts As New SortedSet(Of Integer)
     Public hitPorts As New SortedSet(Of Integer)

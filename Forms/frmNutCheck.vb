@@ -720,6 +720,7 @@
     End Sub
 
     Private Sub BtnSaveCSV_Click(sender As Object, e As EventArgs) Handles BtnSaveCSV.Click
+        If SaveFileDialogCSV.FileName = "" Then SaveFileDialogCSV.FileName = DateTime.Now.ToString("yyyy-MM-dd HH-mm") & " NutCheck.csv"
         Select Case SaveFileDialogCSV.ShowDialog()
             Case DialogResult.Abort, DialogResult.Cancel
                 ' do nothing
