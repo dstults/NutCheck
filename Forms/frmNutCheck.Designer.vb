@@ -304,7 +304,7 @@ Partial Class FrmNutCheck
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 135)
+        Me.Label1.Location = New System.Drawing.Point(12, 134)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(53, 13)
         Me.Label1.TabIndex = 50
@@ -313,7 +313,7 @@ Partial Class FrmNutCheck
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(393, 135)
+        Me.Label2.Location = New System.Drawing.Point(393, 134)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(70, 13)
         Me.Label2.TabIndex = 51
@@ -322,7 +322,7 @@ Partial Class FrmNutCheck
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(728, 135)
+        Me.Label3.Location = New System.Drawing.Point(728, 134)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(96, 13)
         Me.Label3.TabIndex = 52
@@ -436,9 +436,6 @@ Partial Class FrmNutCheck
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.chkVerboseMode)
         Me.Controls.Add(Me.chkIgnoreDead)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btnPreset4)
         Me.Controls.Add(Me.btnPreset3)
         Me.Controls.Add(Me.btnPreset2)
@@ -461,6 +458,9 @@ Partial Class FrmNutCheck
         Me.Controls.Add(Me.chkTcp)
         Me.Controls.Add(Me.chkUdp)
         Me.Controls.Add(Me.chkHostname)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.Label1)
         Me.DoubleBuffered = True
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "FrmNutCheck"

@@ -76,7 +76,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\ClsNetJobs.vb" />
+    <Compile Include="Core\ClsUdpJob.vb" />
+    <Compile Include="Core\ClsNetJob.vb" />
+    <Compile Include="Core\ClsTcpJob.vb" />
     <Compile Include="Core\ModCore.vb" />
     <Compile Include="FileIO\ModFileIO.vb" />
     <Compile Include="Forms\FormProgress.Designer.vb">

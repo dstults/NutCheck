@@ -823,6 +823,11 @@
     End Sub
 
     Private Sub BtnTimer_Click(sender As Object, e As EventArgs) Handles BtnTimer.Click
-        RunTimed
+        RunTimed()
     End Sub
+
+    Private Sub RunTimed()
+
+    End Sub
+
 End Class

@@ -32,7 +32,7 @@
             Case FileTask.Scan
                 ' Not done yet.
             Case FileTask.Save
-                ProgressBar = ContinueSaving()
+                ProgressBar1.Value = ContinueSaving()
         End Select
     End Sub
 End Class
