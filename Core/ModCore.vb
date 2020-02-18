@@ -5,7 +5,7 @@
     'Imports System.Net.NetworkInformation
     ' Acorn Icon: https://www.iconfinder.com/icons/92461/acorn_icon
     ' Free Use License: https://creativecommons.org/licenses/by/3.0/us/
-    Public programNameWithVersion As String = "NutCheck v0.98"
+    Public programNameWithVersion As String = "NutCheck v0.98.2"
     Public lastMajorRevisionDate As String = "2020/02/14"
 
     Public MainForm As FrmNutCheck
